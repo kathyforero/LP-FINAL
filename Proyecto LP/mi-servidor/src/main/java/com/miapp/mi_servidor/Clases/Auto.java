@@ -3,11 +3,11 @@ package com.miapp.mi_servidor.Clases;
 import com.miapp.mi_servidor.Enums.*;
 import java.util.List;
 
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
-import jakarta.validation.constraints.Size;
-import jakarta.validation.constraints.Pattern;
+//import jakarta.validation.constraints.NotEmpty;
+//import jakarta.validation.constraints.NotNull;
+//import jakarta.validation.constraints.Positive;
+//import jakarta.validation.constraints.Size;
+//import jakarta.validation.constraints.Pattern;
 
 public class Auto {
 

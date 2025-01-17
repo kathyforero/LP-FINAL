@@ -5,7 +5,12 @@ import com.google.cloud.firestore.Firestore;
 import com.google.firebase.cloud.FirestoreClient;
 import com.miapp.mi_servidor.Clases.Auto;
 import org.springframework.stereotype.Service;
+import com.miapp.mi_servidor.Excepciones.AutoNoEncontradoException;
+
+
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+
 import com.miapp.mi_servidor.Enums.*;
 
 @Service
@@ -58,17 +63,23 @@ public class AutoServicio{
     }
 
     // Eliminar un auto por su placa
-    public String eliminarAuto(String placa) throws Exception {
+    public String eliminarAuto(String placa) {
+    try {
         Firestore db = FirestoreClient.getFirestore();
         DocumentSnapshot doc = db.collection("autos").document(placa).get().get();
 
         if (!doc.exists()) {
-            throw new RuntimeException("El auto con placa " + placa + " no existe.");
+            System.out.println("Error al eliminar auto: El auto con placa "+ placa + " no existe.");
+            throw new AutoNoEncontradoException("El auto con placa " + placa + " no existe.");
         }
 
         db.collection("autos").document(placa).delete();
         return "Auto eliminado exitosamente";
+    } catch (InterruptedException | ExecutionException e) {
+        // Lanza una excepción personalizada o maneja el error
+        throw new RuntimeException("Error al interactuar con Firestore: " + e.getMessage(), e);
     }
+}
 
     // Actualizar un auto existente
     public String actualizarAuto(Auto auto) throws Exception {
