@@ -8,19 +8,22 @@ import org.springframework.context.annotation.Configuration;
 import javax.annotation.PostConstruct;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 @Configuration
 public class FirebaseConfig {
 
     @PostConstruct
     public void initialize() throws IOException {
-        FileInputStream serviceAccount = new FileInputStream("src/main/java/com/miapp/mi_servidor/FireBase/serviceAccountKey.json");
-        
+        InputStream serviceAccount = getClass().getClassLoader().getResourceAsStream("firebase/serviceAccountKey.json");
+
         FirebaseOptions options = FirebaseOptions.builder()
-                .setCredentials(GoogleCredentials.fromStream(serviceAccount))
-                .setDatabaseUrl("https://<tu-database>.firebaseio.com") // Cambia esta URL por la de tu base de datos
-                .build();
+            .setCredentials(GoogleCredentials.fromStream(serviceAccount))
+            .setDatabaseUrl("https://<tu-database>.firebaseio.com")
+            .build();
 
         FirebaseApp.initializeApp(options);
+
+        
     }
 }

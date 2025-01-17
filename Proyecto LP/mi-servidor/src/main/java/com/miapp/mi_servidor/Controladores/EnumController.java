@@ -1,4 +1,4 @@
-package com.miapp.mi_servidor.Clases;
+package com.miapp.mi_servidor.Controladores;
 
 import java.util.Arrays;
 import java.util.stream.Collectors;
