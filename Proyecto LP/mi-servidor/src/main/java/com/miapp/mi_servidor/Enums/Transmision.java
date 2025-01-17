@@ -6,13 +6,13 @@ package com.miapp.mi_servidor.Enums;
  */
 public enum Transmision {
     MANUAL("Manual"),
-    AUTOMÁTICA("Automática"),
+    AUTOMATICA("Automatica"),
     CVT("Continuamente Variable"),
     DSG("Doble Embrague"),
     AMT("Manual Automatizada"),
     MANUAL_SECUENCIAL("Manual Secuencial"),
-    EVT("Electrónica Variable"),
-    HIDRÁULICA("Hidráulica");
+    EVT("Electronica Variable"),
+    HIDRAULICA("Hidraulica");
 
     private final String displayName;
 

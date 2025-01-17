@@ -2,9 +2,9 @@ package com.miapp.mi_servidor.Enums;
 
 public enum Motor {
     GASOLINA("Gasolina"),
-    DIESEL("Diésel"),
-    ELÉCTRICO("Eléctrico"),
-    HÍBRIDO("Híbrido"),
+    DIESEL("Diesel"),
+    ELÉCTRICO("Electrico"),
+    HÍBRIDO("Hibrido"),
     GAS("Gas");
 
     private final String displayName;

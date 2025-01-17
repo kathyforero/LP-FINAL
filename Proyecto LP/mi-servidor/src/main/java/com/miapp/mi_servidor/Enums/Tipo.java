@@ -2,15 +2,15 @@ package com.miapp.mi_servidor.Enums;
 
 
 public enum Tipo {
-    SEDAN("Sedán"),
-    COUPE("Coupé"),
+    SEDAN("Sedan"),
+    COUPE("Coupe"),
     CONVERTIBLE("Convertible"),
     HATCHBACK("Hatch-Back"),
     SUV("SUV"),
     PICK_UP("Pick-Up"),
-    HIBRIDO("Híbrido"),
+    HIBRIDO("Hibrido"),
     LIMOSINA("Limosina"),
-    ELECTRICO("Eléctrico");
+    ELECTRICO("Electrico");
 
     private final String displayName;
 
