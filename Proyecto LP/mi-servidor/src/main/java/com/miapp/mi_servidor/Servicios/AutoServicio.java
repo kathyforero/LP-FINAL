@@ -6,14 +6,26 @@ import com.google.firebase.cloud.FirestoreClient;
 import com.miapp.mi_servidor.Clases.Auto;
 import org.springframework.stereotype.Service;
 import java.util.List;
+import com.miapp.mi_servidor.Enums.*;
 
 public class AutoServicio{
+    // Guardar un auto, usando la placa como document ID
     public String guardarAuto(Auto auto) {
         Firestore db = FirestoreClient.getFirestore();
         db.collection("autos").document(auto.getPlaca()).set(auto);
         return "Auto guardado exitosamente";
     }
 
+    public void convertirEnum(Auto auto, DocumentSnapshot doc){
+        auto.setEstado(doc.getString("estado") != null ? Estado.valueOf(doc.getString("estado")) : null);
+        auto.setMarca(doc.getString("marca") != null ? MarcaDeAuto.valueOf(doc.getString("marca")) : null);
+        auto.setTipo(doc.getString("tipo") != null ? Tipo.valueOf(doc.getString("tipo")) : null);
+        auto.setMotor(doc.getString("motor") != null ? Motor.valueOf(doc.getString("motor")) : null);
+        auto.setTransmisión(doc.getString("transmisión") != null ? Transmision.valueOf(doc.getString("transmisión")) : null);
+        auto.setUbicacion(doc.getString("ubicacion") != null ? Ubicacion.valueOf(doc.getString("ubicacion")) : null);
+    }    
+    
+    // Obtener un auto por su placa
     public Auto obtenerAuto(String placa) throws Exception {
         Firestore db = FirestoreClient.getFirestore();
         DocumentSnapshot doc = db.collection("autos").document(placa).get().get();
@@ -22,10 +34,29 @@ public class AutoServicio{
             throw new RuntimeException("El auto con placa " + placa + " no existe.");
         }
 
-        return doc.toObject(Auto.class);
+        Auto auto = doc.toObject(Auto.class);
+
+        // Conversión manual de enums si es necesario
+        convertirEnum(auto, doc);
+
+        return auto;
     }
 
+    // Listar todos los autos
+    public List<Auto> obtenerTodosLosAutos() throws Exception {
+        Firestore db = FirestoreClient.getFirestore();
+        List<Auto> autos = db.collection("autos").get().get().toObjects(Auto.class);
 
+        // Conversión manual de enums si es necesario
+        for (Auto auto : autos) {
+            DocumentSnapshot doc = db.collection("autos").document(auto.getPlaca()).get().get();
+            convertirEnum(auto, doc);
+        }
+
+        return autos;
+    }
+
+    // Eliminar un auto por su placa
     public String eliminarAuto(String placa) throws Exception {
         Firestore db = FirestoreClient.getFirestore();
         DocumentSnapshot doc = db.collection("autos").document(placa).get().get();
@@ -38,4 +69,16 @@ public class AutoServicio{
         return "Auto eliminado exitosamente";
     }
 
+    // Actualizar un auto existente
+    public String actualizarAuto(Auto auto) throws Exception {
+        Firestore db = FirestoreClient.getFirestore();
+        DocumentSnapshot doc = db.collection("autos").document(auto.getPlaca()).get().get();
+
+        if (!doc.exists()) {
+            throw new RuntimeException("El auto con placa " + auto.getPlaca() + " no existe.");
+        }
+
+        db.collection("autos").document(auto.getPlaca()).set(auto);
+        return "Auto actualizado exitosamente";
+    }
 }
