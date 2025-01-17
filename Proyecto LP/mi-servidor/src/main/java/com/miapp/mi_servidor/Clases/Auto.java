@@ -4,12 +4,11 @@ import com.miapp.mi_servidor.Enums.*;
 import java.util.List;
 
 public class Auto {
-    private String id;
     private float precio;
     private MarcaDeAuto marca;
     private String modelo;
     private Tipo tipo;
-    private int año;
+    private int anio;
     private String placa;
     private int kilometraje;
     private Motor motor;
@@ -20,14 +19,16 @@ public class Auto {
     private String usuario;
     private List<String> fotos;
 
-    public Auto(float precio, MarcaDeAuto marca, String modelo, Tipo tipo, int año, String placa, int kilometraje,
+    public Auto(){}; //firebase constructor
+
+    public Auto(float precio, MarcaDeAuto marca, String modelo, Tipo tipo, int anio, String placa, int kilometraje,
             Motor motor, Transmision transmisión, float peso, Ubicacion ubicacion, String usuario, Estado estado,
             List<String> fotos) {
         this.precio = precio;
         this.marca = marca;
         this.modelo = modelo;
         this.tipo = tipo;
-        this.año = año;
+        this.anio = anio;
         this.kilometraje = kilometraje;
         this.motor = motor;
         this.transmisión = transmisión;
@@ -56,7 +57,7 @@ public class Auto {
     }
 
     public int getAño() {
-        return año;
+        return anio;
     }
 
     public int getKilometraje() {
@@ -107,8 +108,8 @@ public class Auto {
         this.tipo = tipo;
     }
 
-    public void setAño(int año) {
-        this.año = año;
+    public void setAño(int anio) {
+        this.anio = anio;
     }
 
     public void setKilometraje(int kilometraje) {
@@ -153,7 +154,7 @@ public class Auto {
 
     @Override
     public String toString() {
-        return "Auto [precio=" + precio + ", marca=" + marca + ", modelo=" + modelo + ", tipo=" + tipo + ", año=" + año
+        return "Auto [precio=" + precio + ", marca=" + marca + ", modelo=" + modelo + ", tipo=" + tipo + ", año=" + anio
                 + ", placa=" + placa + ", kilometraje=" + kilometraje + ", motor=" + motor + ", transmisión="
                 + transmisión + ", peso=" + peso + ", ubicacion=" + ubicacion + ", estado=" + estado + ", usuario="
                 + usuario + "]";
