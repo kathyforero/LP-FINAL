@@ -22,7 +22,7 @@ public class AutoServicio{
         auto.setMarca(doc.getString("marca") != null ? MarcaDeAuto.valueOf(doc.getString("marca")) : null);
         auto.setTipo(doc.getString("tipo") != null ? Tipo.valueOf(doc.getString("tipo")) : null);
         auto.setMotor(doc.getString("motor") != null ? Motor.valueOf(doc.getString("motor")) : null);
-        auto.setTransmisión(doc.getString("transmisión") != null ? Transmision.valueOf(doc.getString("transmisión")) : null);
+        auto.setTransmision(doc.getString("transmision") != null ? Transmision.valueOf(doc.getString("transmision")) : null);
         auto.setUbicacion(doc.getString("ubicacion") != null ? Ubicacion.valueOf(doc.getString("ubicacion")) : null);
     }    
     

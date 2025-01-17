@@ -12,7 +12,7 @@ public class Auto {
     private String placa;
     private int kilometraje;
     private Motor motor;
-    private Transmision transmisión;
+    private Transmision transmision;
     private float peso;
     private Ubicacion ubicacion;
     private Estado estado;
@@ -22,7 +22,7 @@ public class Auto {
     public Auto(){}; //firebase constructor
 
     public Auto(float precio, MarcaDeAuto marca, String modelo, Tipo tipo, int anio, String placa, int kilometraje,
-            Motor motor, Transmision transmisión, float peso, Ubicacion ubicacion, String usuario, Estado estado,
+            Motor motor, Transmision transmision, float peso, Ubicacion ubicacion, String usuario, Estado estado,
             List<String> fotos) {
         this.precio = precio;
         this.marca = marca;
@@ -31,7 +31,7 @@ public class Auto {
         this.anio = anio;
         this.kilometraje = kilometraje;
         this.motor = motor;
-        this.transmisión = transmisión;
+        this.transmision = transmision;
         this.peso = peso;
         this.ubicacion = ubicacion;
         this.usuario = usuario;
@@ -68,8 +68,8 @@ public class Auto {
         return motor;
     }
 
-    public Transmision getTransmisión() {
-        return transmisión;
+    public Transmision getTransmision() {
+        return transmision;
     }
 
     public float getPeso() {
@@ -120,8 +120,8 @@ public class Auto {
         this.motor = motor;
     }
 
-    public void setTransmisión(Transmision transmisión) {
-        this.transmisión = transmisión;
+    public void setTransmision(Transmision transmisión) {
+        this.transmision = transmisión;
     }
 
     public void setPeso(float peso) {
@@ -156,7 +156,7 @@ public class Auto {
     public String toString() {
         return "Auto [precio=" + precio + ", marca=" + marca + ", modelo=" + modelo + ", tipo=" + tipo + ", año=" + anio
                 + ", placa=" + placa + ", kilometraje=" + kilometraje + ", motor=" + motor + ", transmisión="
-                + transmisión + ", peso=" + peso + ", ubicacion=" + ubicacion + ", estado=" + estado + ", usuario="
+                + transmision + ", peso=" + peso + ", ubicacion=" + ubicacion + ", estado=" + estado + ", usuario="
                 + usuario + "]";
     }
 
