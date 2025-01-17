@@ -4,6 +4,7 @@ import com.miapp.mi_servidor.Enums.*;
 import java.util.List;
 
 public class Auto {
+    private String id;
     private float precio;
     private MarcaDeAuto marca;
     private String modelo;
