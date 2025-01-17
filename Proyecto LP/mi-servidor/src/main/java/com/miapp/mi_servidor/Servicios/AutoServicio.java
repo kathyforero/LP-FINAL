@@ -22,7 +22,7 @@ public class AutoServicio{
         return "Auto guardado exitosamente";
     }
 
-    public void convertirEnum(Auto auto, DocumentSnapshot doc){
+    private void convertirEnum(Auto auto, DocumentSnapshot doc){
         auto.setEstado(doc.getString("estado") != null ? Estado.valueOf(doc.getString("estado")) : null);
         auto.setMarca(doc.getString("marca") != null ? MarcaDeAuto.valueOf(doc.getString("marca")) : null);
         auto.setTipo(doc.getString("tipo") != null ? Tipo.valueOf(doc.getString("tipo")) : null);
