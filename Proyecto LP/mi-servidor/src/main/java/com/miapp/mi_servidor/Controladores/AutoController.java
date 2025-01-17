@@ -8,10 +8,12 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api")
-public class VehiculoController {
+public class AutoController {
 
-    @GetMapping("/vehiculos")
-    public List<String> obtenerVehiculos() {
+    @GetMapping("/autos")
+    public List<String> obtenerAutos() {
         return List.of("Auto 1", "Auto 2", "Auto 3");
     }
+
+
 }
