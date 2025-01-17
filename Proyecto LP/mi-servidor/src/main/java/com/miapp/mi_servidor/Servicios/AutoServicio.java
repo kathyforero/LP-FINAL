@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import com.miapp.mi_servidor.Enums.*;
 
+@Service
 public class AutoServicio{
     // Guardar un auto, usando la placa como document ID
     public String guardarAuto(Auto auto) {
