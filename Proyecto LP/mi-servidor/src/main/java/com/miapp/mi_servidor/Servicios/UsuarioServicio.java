@@ -2,6 +2,7 @@ package com.miapp.mi_servidor.Servicios;
 
 import com.google.cloud.firestore.*;
 import com.google.firebase.cloud.FirestoreClient;
+import com.miapp.mi_servidor.Clases.HashUtil;
 import com.miapp.mi_servidor.Clases.Usuario;
 import com.miapp.mi_servidor.Excepciones.UsuarioNoEncontradoException;
 
@@ -25,6 +26,7 @@ public class UsuarioServicio {
             }
     
             // Guardar el usuario
+            System.out.println(usuario.getContrasena());
             db.collection("usuarios").document(usuario.getCorreo()).set(usuario);
             return "Usuario creado exitosamente.";
         } catch (InterruptedException | ExecutionException e) {
@@ -54,7 +56,9 @@ public class UsuarioServicio {
     public boolean autenticarUsuario(String correo, String contrasena){
         Usuario usuario = buscarUsuarioPorCorreo(correo);
         if (usuario != null) {
-            return usuario.validarContrasena(contrasena);
+            System.out.println(HashUtil.md5(contrasena));
+            System.out.println(usuario.getContrasena());
+            return usuario.getContrasena().equals(HashUtil.md5(contrasena));
         }
         return false;
     }

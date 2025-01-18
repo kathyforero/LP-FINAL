@@ -19,14 +19,6 @@ public class Usuario {
         this.contrasena = HashUtil.md5(contrasena);
     }
 
-    public boolean validarUsuario(String correo, String contrasena) {
-        if (correo.equals(this.correo) && contrasena.equals(this.contrasena)) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
     public boolean validarContrasena(String contrasena) {
         return this.contrasena.equals(HashUtil.md5(contrasena));
     }
@@ -72,7 +64,7 @@ public class Usuario {
     }
 
     public void setContrasena(String contrasena) {
-        this.contrasena = HashUtil.md5(contrasena);
+        this.contrasena = contrasena;
     }
 
     public void setFavorito(List<String> favoritos) {
