@@ -37,7 +37,8 @@ public class AutoServicio{
         DocumentSnapshot doc = db.collection("autos").document(placa).get().get();
 
         if (!doc.exists()) {
-            throw new RuntimeException("El auto con placa " + placa + " no existe.");
+            System.out.println("Error al obtener auto: El auto con placa "+ placa + " no existe.");
+            throw new AutoNoEncontradoException("El auto con placa " + placa + " no existe.");
         }
 
         Auto auto = doc.toObject(Auto.class);

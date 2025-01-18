@@ -11,7 +11,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.google.cloud.Binding;
 import com.miapp.mi_servidor.Clases.Auto;
+import com.miapp.mi_servidor.Excepciones.AutoNoEncontradoException;
 import com.miapp.mi_servidor.Servicios.AutoServicio;
 
 import java.util.HashMap;
@@ -19,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 
 @RestController
 @RequestMapping("/api/autos")
@@ -76,12 +79,79 @@ public class AutoController {
     }
 
     @PutMapping
-    public String actualizarAuto(@RequestBody Auto auto) throws Exception {
-        return autoServicio.actualizarAuto(auto);
+    public ResponseEntity<Map<String, Object>> actualizarAuto(@Valid @RequestBody Auto auto, BindingResult bindingResult) throws Exception {
+        try {
+            // Validación de existencia del auto
+            if (autoServicio.obtenerAuto(auto.getPlaca()) == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of(
+                    "status", "error",
+                    "message", "Error al actualizar el auto",
+                    "errors", "El auto con la placa proporcionada no existe"
+                ));
+            }
+
+            if (bindingResult.hasErrors()) {
+                Map<String, Object> errores = new HashMap<>();
+                bindingResult.getFieldErrors().forEach(error -> 
+                    errores.put(error.getField(), error.getDefaultMessage())
+                );
+
+                return ResponseEntity.badRequest().body(Map.of(
+                    "status", "error",
+                    "message", "Errores en los datos enviados",
+                    "errors", errores
+                ));
+            }
+
+            String mensajeExitoso = autoServicio.actualizarAuto(auto);
+            Map<String, Object> response = new HashMap<>();
+            response.put("mensaje", mensajeExitoso);
+            response.put("auto", auto);
+
+            return ResponseEntity.ok(response);
+        } catch (AutoNoEncontradoException e) {
+            // Capturar la excepción personalizada y devolver 404
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of(
+                "status", "error",
+                "message", e.getMessage()
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
+                "status", "error",
+                "message", "Error interno del servidor",
+                "errors", e.getMessage()
+            ));
+        }
     }
 
     @DeleteMapping("/{placa}")
-    public String eliminarAuto(@PathVariable String placa) throws Exception {
-        return autoServicio.eliminarAuto(placa);
+    public ResponseEntity<Map<String, Object>> eliminarAuto(@PathVariable String placa) throws Exception {
+        try {
+            // Validación de existencia del auto
+            if (autoServicio.obtenerAuto(placa) == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of(
+                    "status", "error",
+                    "message", "Error al eliminar el auto",
+                    "errors", "El auto con la placa proporcionada no existe"
+                ));
+            }
+    
+            // Eliminar el auto
+            String mensajeExitoso = autoServicio.eliminarAuto(placa);
+            Map<String, Object> response = new HashMap<>();
+            response.put("mensaje", mensajeExitoso);
+            response.put("auto", placa);
+    
+            return ResponseEntity.ok(response);
+    
+        } catch (Exception e) {
+            // Captura cualquier error y devuelve un mensaje adecuado
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
+                "status", "error",
+                "message", "Error interno del servidor",
+                "errors", e.getMessage()
+            ));
+        }
     }
 }
+
