@@ -46,7 +46,7 @@ public class AutoController {
     @PostMapping
     public ResponseEntity<Map<String, Object>> guardarAuto(@Valid @RequestBody Auto auto, BindingResult bindingResult) throws Exception {
         
-        if(autoServicio.obtenerAuto(auto.getPlaca())!=null){
+        if(autoServicio.obtenerAutoValidar(auto.getPlaca())==true){
             return ResponseEntity.badRequest().body(Map.of(
                 "status", "error",
                 "message", "Errores en los datos enviados",
@@ -82,7 +82,7 @@ public class AutoController {
     public ResponseEntity<Map<String, Object>> actualizarAuto(@Valid @RequestBody Auto auto, BindingResult bindingResult) throws Exception {
         try {
             // Validación de existencia del auto
-            if (autoServicio.obtenerAuto(auto.getPlaca()) == null) {
+            if (autoServicio.obtenerAutoValidar(auto.getPlaca()) == false) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of(
                     "status", "error",
                     "message", "Error al actualizar el auto",
@@ -128,7 +128,7 @@ public class AutoController {
     public ResponseEntity<Map<String, Object>> eliminarAuto(@PathVariable String placa) throws Exception {
         try {
             // Validación de existencia del auto
-            if (autoServicio.obtenerAuto(placa) == null) {
+            if (autoServicio.obtenerAutoValidar(placa) == false) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of(
                     "status", "error",
                     "message", "Error al eliminar el auto",

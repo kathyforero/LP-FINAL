@@ -49,6 +49,34 @@ public class AutoServicio{
         return auto;
     }
 
+    // Obtener un auto por su placa
+    public boolean obtenerAutoValidar(String placa) {
+        Firestore db = FirestoreClient.getFirestore();
+        DocumentSnapshot doc;
+        try {
+            doc = db.collection("autos").document(placa).get().get();
+
+            if (!doc.exists()) {
+                return false;
+            }
+
+            Auto auto = doc.toObject(Auto.class);
+
+            // Conversión manual de enums si es necesario
+            convertirEnum(auto, doc);
+
+
+        } catch (InterruptedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }   
+        
+        return true;
+    }
+
     // Listar todos los autos
     public List<Auto> obtenerTodosLosAutos() throws Exception {
         Firestore db = FirestoreClient.getFirestore();
