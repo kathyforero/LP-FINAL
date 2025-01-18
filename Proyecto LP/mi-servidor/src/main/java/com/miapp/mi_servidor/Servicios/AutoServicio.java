@@ -102,12 +102,27 @@ public class AutoServicio{
                 .whereEqualTo("usuarioCorreo", usuarioCorreo)
                 .get();
 
+
         List<QueryDocumentSnapshot> documentos = future.get().getDocuments();
         List<Auto> autos = new ArrayList<>();
 
         // Convertir documentos en objetos Auto
         for (QueryDocumentSnapshot documento : documentos) {
             autos.add(documento.toObject(Auto.class));
+        }
+
+        return autos;
+    }
+
+    public List<Auto> obtenerTodosLosAutos(String usuarioCorreo) throws Exception {
+        Firestore db = FirestoreClient.getFirestore();
+        List<Auto> autos = db.collection("autos").get().get().toObjects(Auto.class);
+
+        // Conversión manual de enums si es necesario
+        for (Auto auto : autos) {
+            DocumentSnapshot doc = db.collection("autos").document(auto.getPlaca()).get().get();
+            
+            convertirEnum(auto, doc);
         }
 
         return autos;
