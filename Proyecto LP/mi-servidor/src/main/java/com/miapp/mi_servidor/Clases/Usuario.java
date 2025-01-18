@@ -1,27 +1,34 @@
 package com.miapp.mi_servidor.Clases;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Usuario {
     private String nombre;
     private String apellido;
     private String correo;
-    private String contraseña;
-    private List<String> favoritos;
+    private String contrasena;
+    private List<String> favoritos = new ArrayList<>();
 
-    public Usuario(String nombre, String apellido, String correo, String contraseña) {
+    public Usuario() {} // Constructor vacío para Firebase
+
+    public Usuario(String nombre, String apellido, String correo, String contrasena) {
         this.nombre = nombre;
         this.apellido = apellido;
         this.correo = correo;
-        this.contraseña = contraseña;
+        this.contrasena = HashUtil.md5(contrasena);
     }
 
-    public boolean validarUsuario(String correo, String contraseña) {
-        if (correo.equals(this.correo) && contraseña.equals(this.contraseña)) {
+    public boolean validarUsuario(String correo, String contrasena) {
+        if (correo.equals(this.correo) && contrasena.equals(this.contrasena)) {
             return true;
         } else {
             return false;
         }
+    }
+
+    public boolean validarContrasena(String contrasena) {
+        return this.contrasena.equals(HashUtil.md5(contrasena));
     }
 
     public String getNombre() {
@@ -36,8 +43,8 @@ public class Usuario {
         return correo;
     }
 
-    public String getContraseña() {
-        return contraseña;
+    public String getContrasena() {
+        return contrasena;
     }
 
     public List<String> getFavoritos() {
@@ -45,7 +52,11 @@ public class Usuario {
     }
 
     public void addFavorito(String auto) {
-        favoritos.addLast(auto);
+        favoritos.add(auto);
+    }
+
+    public void removeFavorito(String autoId) {
+        favoritos.remove(autoId);
     }
 
     public void setNombre(String nombre) {
@@ -60,8 +71,8 @@ public class Usuario {
         this.correo = correo;
     }
 
-    public void setContraseña(String contraseña) {
-        this.contraseña = contraseña;
+    public void setContrasena(String contrasena) {
+        this.contrasena = HashUtil.md5(contrasena);
     }
 
     public void setFavorito(List<String> favoritos) {
