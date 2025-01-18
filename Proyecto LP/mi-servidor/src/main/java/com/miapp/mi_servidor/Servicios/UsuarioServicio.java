@@ -26,7 +26,6 @@ public class UsuarioServicio {
             }
     
             // Guardar el usuario
-            System.out.println(usuario.getContrasena());
             db.collection("usuarios").document(usuario.getCorreo()).set(usuario);
             return "Usuario creado exitosamente.";
         } catch (InterruptedException | ExecutionException e) {
@@ -56,8 +55,6 @@ public class UsuarioServicio {
     public boolean autenticarUsuario(String correo, String contrasena){
         Usuario usuario = buscarUsuarioPorCorreo(correo);
         if (usuario != null) {
-            System.out.println(HashUtil.md5(contrasena));
-            System.out.println(usuario.getContrasena());
             return usuario.getContrasena().equals(HashUtil.md5(contrasena));
         }
         return false;

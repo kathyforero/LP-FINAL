@@ -1,13 +1,16 @@
 package com.miapp.mi_servidor.Servicios;
 
+import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
+import com.google.cloud.firestore.QueryDocumentSnapshot;
+import com.google.cloud.firestore.QuerySnapshot;
 import com.google.firebase.cloud.FirestoreClient;
 import com.miapp.mi_servidor.Clases.Auto;
 import org.springframework.stereotype.Service;
 import com.miapp.mi_servidor.Excepciones.AutoNoEncontradoException;
 
-
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -86,6 +89,25 @@ public class AutoServicio{
         for (Auto auto : autos) {
             DocumentSnapshot doc = db.collection("autos").document(auto.getPlaca()).get().get();
             convertirEnum(auto, doc);
+        }
+
+        return autos;
+    }
+
+    public List<Auto> obtenerAutosPorUsuario(String usuarioCorreo) throws Exception {
+        Firestore db = FirestoreClient.getFirestore();
+
+        // Consultar autos donde "usuarioCorreo" coincide con el correo dado
+        ApiFuture<QuerySnapshot> future = db.collection("autos")
+                .whereEqualTo("usuarioCorreo", usuarioCorreo)
+                .get();
+
+        List<QueryDocumentSnapshot> documentos = future.get().getDocuments();
+        List<Auto> autos = new ArrayList<>();
+
+        // Convertir documentos en objetos Auto
+        for (QueryDocumentSnapshot documento : documentos) {
+            autos.add(documento.toObject(Auto.class));
         }
 
         return autos;

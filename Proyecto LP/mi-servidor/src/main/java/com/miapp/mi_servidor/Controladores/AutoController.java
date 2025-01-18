@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.google.cloud.Binding;
 import com.miapp.mi_servidor.Clases.Auto;
 import com.miapp.mi_servidor.Excepciones.AutoNoEncontradoException;
 import com.miapp.mi_servidor.Servicios.AutoServicio;
@@ -37,6 +36,17 @@ public class AutoController {
     public List<Auto> obtenerTodosLosAutos() throws Exception {
         return autoServicio.obtenerTodosLosAutos();
     }
+
+    @GetMapping("/usuario/{correo}")
+    public ResponseEntity<List<Auto>> obtenerAutosPorUsuario(@PathVariable String correo) {
+        try {
+            List<Auto> autos = autoServicio.obtenerAutosPorUsuario(correo);
+            return ResponseEntity.ok(autos);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(null);
+        }
+    }
+
 
     @GetMapping("/{placa}")
     public Auto obtenerAuto(@PathVariable String placa) throws Exception {

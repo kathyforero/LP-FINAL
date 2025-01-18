@@ -53,8 +53,7 @@ public class Auto {
     @NotNull(message = "El estado no puede ser nulo.")
     private Estado estado;
 
-    @NotEmpty(message = "El usuario no puede estar vacío.")
-    private String usuario;
+    private String usuarioCorreo;
 
     @NotNull(message = "Las fotos no pueden ser nulas.")
     private List<String> fotos;
@@ -62,7 +61,7 @@ public class Auto {
     public Auto(){}; //firebase constructor
 
     public Auto(float precio, MarcaDeAuto marca, String modelo, Tipo tipo, int anio, String placa, int kilometraje,
-            Motor motor, Transmision transmision, float peso, Ubicacion ubicacion, String usuario, Estado estado,
+            Motor motor, Transmision transmision, float peso, Ubicacion ubicacion, String usuarioCorreo, Estado estado,
             List<String> fotos) {
         this.precio = precio;
         this.marca = marca;
@@ -74,7 +73,7 @@ public class Auto {
         this.transmision = transmision;
         this.peso = peso;
         this.ubicacion = ubicacion;
-        this.usuario = usuario;
+        this.usuarioCorreo = usuarioCorreo;
         this.estado = estado;
         this.placa = placa;
         this.fotos = fotos;
@@ -120,8 +119,8 @@ public class Auto {
         return ubicacion;
     }
 
-    public String getUsuario() {
-        return usuario;
+    public String getUsuarioCorreo() {
+        return usuarioCorreo;
     }
 
     public Estado getEstado() {
@@ -172,8 +171,8 @@ public class Auto {
         this.ubicacion = ubicacion;
     }
 
-    public void setUsuario(String usuario) {
-        this.usuario = usuario;
+    public void setUsuarioCorreo(String usuarioCorreo) {
+        this.usuarioCorreo = usuarioCorreo;
     }
 
     public void setEstado(Estado estado) {
@@ -196,8 +195,8 @@ public class Auto {
     public String toString() {
         return "Auto [precio=" + precio + ", marca=" + marca + ", modelo=" + modelo + ", tipo=" + tipo + ", año=" + anio
                 + ", placa=" + placa + ", kilometraje=" + kilometraje + ", motor=" + motor + ", transmisión="
-                + transmision + ", peso=" + peso + ", ubicacion=" + ubicacion + ", estado=" + estado + ", usuario="
-                + usuario + "]";
+                + transmision + ", peso=" + peso + ", ubicacion=" + ubicacion + ", estado=" + estado + ", Correo="
+                + usuarioCorreo + "]";
     }
 
 }
