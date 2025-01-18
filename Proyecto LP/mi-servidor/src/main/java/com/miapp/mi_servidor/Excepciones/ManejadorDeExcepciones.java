@@ -5,7 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
-@ControllerAdvice
+/*@ControllerAdvice
 public class ManejadorDeExcepciones {
 
     @ExceptionHandler(AutoNoEncontradoException.class)
@@ -13,3 +13,4 @@ public class ManejadorDeExcepciones {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
     }
 }
+*/
