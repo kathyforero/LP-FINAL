@@ -6,23 +6,35 @@ import com.google.firebase.FirebaseOptions;
 import org.springframework.context.annotation.Configuration;
 
 import javax.annotation.PostConstruct;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.ByteArrayInputStream;
 
 @Configuration
 public class FirebaseConfig {
 
     @PostConstruct
-    public void initialize() throws IOException {
-        InputStream serviceAccount = getClass().getClassLoader().getResourceAsStream("firebase/serviceAccountKey.json");
+    public void initialize() {
+        try {
+            // Obtiene las credenciales desde una variable de entorno
+            String firebaseConfig = System.getenv("GOOGLE_APPLICATION_CREDENTIALS_JSON");
 
-        FirebaseOptions options = FirebaseOptions.builder()
-            .setCredentials(GoogleCredentials.fromStream(serviceAccount))
-            .setDatabaseUrl("https://<tu-database>.firebaseio.com")
-            .build();
+            if (firebaseConfig == null || firebaseConfig.isEmpty()) {
+                throw new IllegalStateException("La variable de entorno GOOGLE_APPLICATION_CREDENTIALS_JSON no está configurada.");
+            }
 
-        FirebaseApp.initializeApp(options);
+            // Carga las credenciales desde la variable de entorno
+            ByteArrayInputStream serviceAccount = new ByteArrayInputStream(firebaseConfig.getBytes());
 
-        
+            FirebaseOptions options = FirebaseOptions.builder()
+                    .setCredentials(GoogleCredentials.fromStream(serviceAccount))
+                    .setDatabaseUrl("https://<tu-database>.firebaseio.com")
+                    .build();
+
+            if (FirebaseApp.getApps().isEmpty()) {
+                FirebaseApp.initializeApp(options);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
