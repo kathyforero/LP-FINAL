@@ -2,7 +2,7 @@
 FROM eclipse-temurin:21-jdk  
 
 # Copia el archivo JAR generado
-COPY target/mi-servidor.jar app.jar  
+COPY target/mi-servidor-0.0.1-SNAPSHOT.jar app.jar  
 
 # Comando para ejecutar tu aplicación
 ENTRYPOINT ["java", "-jar", "app.jar"] 

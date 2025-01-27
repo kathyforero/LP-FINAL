@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Configuration;
 
 import javax.annotation.PostConstruct;
 import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 
 @Configuration
 public class FirebaseConfig {
@@ -15,15 +16,18 @@ public class FirebaseConfig {
     public void initialize() {
         try {
             // Obtiene las credenciales desde una variable de entorno
-            String firebaseConfig = System.getenv("GOOGLE_APPLICATION_CREDENTIALS_JSON");
+             
 
-            if (firebaseConfig == null || firebaseConfig.isEmpty()) {
-                throw new IllegalStateException("La variable de entorno GOOGLE_APPLICATION_CREDENTIALS_JSON no está configurada.");
-            }
+            //String firebaseConfig = System.getenv("GOOGLE_APPLICATION_CREDENTIALS_JSON");
+
+            //if (firebaseConfig == null || firebaseConfig.isEmpty()) {
+            //    throw new IllegalStateException("La variable de entorno GOOGLE_APPLICATION_CREDENTIALS_JSON no está configurada.");
+            //}
 
             // Carga las credenciales desde la variable de entorno
-            ByteArrayInputStream serviceAccount = new ByteArrayInputStream(firebaseConfig.getBytes());
+            //ByteArrayInputStream serviceAccount = new ByteArrayInputStream(firebaseConfig.getBytes());
 
+            InputStream serviceAccount = getClass().getClassLoader().getResourceAsStream("firebase/serviceAccountKey.json");
             FirebaseOptions options = FirebaseOptions.builder()
                     .setCredentials(GoogleCredentials.fromStream(serviceAccount))
                     .setDatabaseUrl("https://<tu-database>.firebaseio.com")
