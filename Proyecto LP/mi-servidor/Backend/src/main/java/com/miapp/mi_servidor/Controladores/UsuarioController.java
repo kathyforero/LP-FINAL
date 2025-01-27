@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/usuarios")
@@ -37,7 +38,9 @@ public class UsuarioController {
 
     // Autenticar un usuario
     @PostMapping("/autenticar")
-    public ResponseEntity<String> autenticarUsuario(@RequestParam String correo, @RequestParam String contrasena) {
+    public ResponseEntity<String> autenticarUsuario(@RequestBody Map<String, String> payload) {
+        String correo = payload.get("correo");
+        String contrasena = payload.get("contrasena");
         boolean autenticado = usuarioServicio.autenticarUsuario(correo, contrasena);
         if (autenticado) {
             return ResponseEntity.ok("Usuario autenticado exitosamente.");

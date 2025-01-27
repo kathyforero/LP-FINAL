@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import '../Widgets/PasswordField.dart';
 import 'MainScreen.dart';
 import 'RegisterScreen.dart';
+import '../Configuraciones/Validaciones.dart';
+import '../Configuraciones/ApiServicio.dart';
+import '../Widgets/SnackBarHelper.dart';
+
 
 class LoginScreen extends StatelessWidget {
   final TextEditingController _emailController = TextEditingController();
@@ -62,12 +66,41 @@ class LoginScreen extends StatelessWidget {
               PasswordField(controller: _passwordController),
               const SizedBox(height: 30),
               ElevatedButton(
-                onPressed: () {
-                  // Navegar a la nueva ventana
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => MainScreen()),
-                  );
+                onPressed: () async {
+                  final email = _emailController.text;
+                  final password = _passwordController.text;
+                  if (!Validaciones.valNoVacio(email)) {
+                    SnackBarHelper.showSnackBar(context, 'El correo no puede estar vacío',Colors.red);
+                    return;
+                  }
+                  if (!Validaciones.valUsuario(email)) {
+                    SnackBarHelper.showSnackBar(context, 'Por favor ingresa un correo o usuario válido',Colors.red);
+                    return;
+                  }
+                  if (!Validaciones.valNoVacio(password)) {
+                    SnackBarHelper.showSnackBar(context, 'La contraseña no puede estar vacía',Colors.red);
+                    return;
+                  }
+                  if (!Validaciones.valPassword(password)) {
+                    SnackBarHelper.showSnackBar(context, 'La contraseña debe tener al menos 6 caracteres',Colors.red);
+                    return;
+                  }
+                  try {
+                    final capturedContext = context;
+                    final autenticado = await ApiServicio.autenticarUsuario(email, password);
+                    
+                    if (autenticado) {
+                      Navigator.push(
+                        capturedContext,
+                        MaterialPageRoute(builder: (context) => MainScreen()),
+                      );
+                    } else {
+                        SnackBarHelper.showSnackBar(capturedContext, 'Credenciales Incorrectas', Colors.red);
+                    }
+                  } catch (e) {
+                    print(e);
+                    SnackBarHelper.showSnackBar(context, 'Error al conectar con el servidor', Colors.red);
+                  }
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color.fromARGB(255, 253, 114, 90),
