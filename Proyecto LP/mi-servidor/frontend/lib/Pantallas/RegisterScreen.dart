@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../Widgets/PasswordField.dart';
+import '../Widgets/CustomCheckBox.dart';
 import 'MainScreen.dart';
 import 'LoginScreen.dart';
 
@@ -18,13 +19,17 @@ class RegisterScreen extends StatelessWidget {
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 24),
-          child: Column(
+          child: Row(
+            children: [
+              Expanded(
+              flex: 1,
+              child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               const SizedBox(
-                width: 200, // Ancho de la imagen
-                height: 120, // Alto de la imagen
+                width: 120, // Ancho de la imagen
+                height: 200, // Alto de la imagen
                 child: Image(
                   image: NetworkImage('https://i.postimg.cc/jqpcFJZj/Logo.png'),
                   fit: BoxFit.contain, // Asegura que la imagen cubra el área
@@ -101,7 +106,15 @@ class RegisterScreen extends StatelessWidget {
               
               PasswordField(controller: _passwordConfirmarController),
 
-              const SizedBox(height: 30),
+              const SizedBox(height: 40),
+
+              CustomCheckbox(text: 'Acepto los términos y condiciones.'),
+
+              const SizedBox(height: 10),  
+
+              CustomCheckbox(text: 'Deseo recibir notificaciones sobre autos. (Opcional)'),
+
+              const SizedBox(height: 40),
               ElevatedButton(
                 onPressed: () {
                   // Navegar a la nueva ventana
@@ -147,7 +160,28 @@ class RegisterScreen extends StatelessWidget {
                 ),
               ),
             ],
-          ),
+          )),
+          Expanded(
+            flex: 1,
+            child: Column(
+            children: [
+              SizedBox(
+                width: 800,
+                height: 122, 
+                child: Image(
+                  image: NetworkImage('https://i.postimg.cc/d0pxJs4F/Encuentra-tu-auto-ideal-con-no.gif'),
+                  fit: BoxFit.contain, // Asegura que la imagen cubra el área
+                )),                
+                SizedBox(
+                  width: 534,
+                  height: 800,
+                  child: Image(
+                  image: NetworkImage('https://i.postimg.cc/VvBG9j1s/auto.gif'),
+                  fit: BoxFit.contain, // Asegura que la imagen cubra el área
+                )),
+            ],
+          )),
+          ]),
         ),
       ),
     );

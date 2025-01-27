@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'CrearAutoScreen.dart';
 import '../Widgets/MyPopUpMenu.dart';
+import '../Configuraciones/ApiServicio.dart';
 
 // Pantalla principal (nueva)
 class MainScreen extends StatelessWidget {
@@ -86,7 +87,38 @@ class MainScreen extends StatelessWidget {
                         color: Colors.white),
                   ),
                   const SizedBox(height: 10),
-                  DropdownButtonFormField(
+
+                  FutureBuilder<List<String>>( // FutureBuilder para obtener los modelos desde la API
+              future: ApiServicio.obtenerMarcas(), // Llamada al método obtenerModelos
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  // Mostrar indicador de carga mientras se esperan los datos
+                  return const CircularProgressIndicator();
+                } else if (snapshot.hasError) {
+                  // Mostrar mensaje de error si ocurre un problema
+                  return const Text(
+                    'Error al cargar marcas',
+                    style: TextStyle(color: Colors.white),
+                  );
+                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  // Manejar caso donde no hay datos
+                  return const Text(
+                    'No hay marcas disponibles',
+                    style: TextStyle(color: Colors.white),
+                  );
+                }
+
+                // Crear lista de DropdownMenuItem con los modelos obtenidos
+                List<DropdownMenuItem<String>> items = snapshot.data!
+                    .map((marca) => DropdownMenuItem(
+                          value: marca,
+                          child: Text(
+                            marca,
+                            style: const TextStyle(color: Colors.white),
+                          ),
+                        ))
+                    .toList();
+                    return DropdownButtonFormField(
                     decoration: const InputDecoration(
                       labelText: 'Marca',
                       labelStyle: TextStyle(
@@ -104,23 +136,45 @@ class MainScreen extends StatelessWidget {
                         const Color(0xFF2B193E), // Fondo del desplegable
                     style: const TextStyle(
                         color: Colors.white), // Color del texto seleccionado
-                    items: const [
-                      DropdownMenuItem(
-                        value: 'marca1',
-                        child: Text('Marca 1',
-                            style:
-                                TextStyle(color: Colors.white)), // Texto blanco
-                      ),
-                      DropdownMenuItem(
-                        value: 'marca2',
-                        child: Text('Marca 2',
-                            style: TextStyle(color: Colors.white)),
-                      ),
-                    ],
+                    items: items,
                     onChanged: (value) {},
+                  );
+                  },
                   ),
+
                   const SizedBox(height: 10),
-                  DropdownButtonFormField(
+
+                  FutureBuilder<List<String>>( // FutureBuilder para obtener los modelos desde la API
+              future: ApiServicio.obtenerModelos(), // Llamada al método obtenerModelos
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  // Mostrar indicador de carga mientras se esperan los datos
+                  return const CircularProgressIndicator();
+                } else if (snapshot.hasError) {
+                  // Mostrar mensaje de error si ocurre un problema
+                  return const Text(
+                    'Error al cargar modelos',
+                    style: TextStyle(color: Colors.white),
+                  );
+                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  // Manejar caso donde no hay datos
+                  return const Text(
+                    'No hay modelos disponibles',
+                    style: TextStyle(color: Colors.white),
+                  );
+                }
+
+                // Crear lista de DropdownMenuItem con los modelos obtenidos
+                List<DropdownMenuItem<String>> items = snapshot.data!
+                    .map((modelo) => DropdownMenuItem(
+                          value: modelo,
+                          child: Text(
+                            modelo,
+                            style: const TextStyle(color: Colors.white),
+                          ),
+                        ))
+                    .toList();
+                    return DropdownButtonFormField(
                     decoration: const InputDecoration(
                       labelText: 'Modelo',
                       labelStyle: TextStyle(
@@ -138,22 +192,14 @@ class MainScreen extends StatelessWidget {
                         const Color(0xFF2B193E), // Fondo del desplegable
                     style: const TextStyle(
                         color: Colors.white), // Color del texto seleccionado
-                    items: const [
-                      DropdownMenuItem(
-                        value: 'modelo1',
-                        child: Text('Modelo 1',
-                            style:
-                                TextStyle(color: Colors.white)), // Texto blanco
-                      ),
-                      DropdownMenuItem(
-                        value: 'modelo2',
-                        child: Text('Modelo 2',
-                            style: TextStyle(color: Colors.white)),
-                      ),
-                    ],
+                    items: items,
                     onChanged: (value) {},
+                  );
+                  },
                   ),
+
                   const SizedBox(height: 10),
+
                   Row(
                     children: [
                       Flexible(
@@ -201,8 +247,40 @@ class MainScreen extends StatelessWidget {
                       ),
                     ],
                   ),
+
                   const SizedBox(height: 10),
-                  DropdownButtonFormField(
+
+                  FutureBuilder<List<String>>( // FutureBuilder para obtener los modelos desde la API
+              future: ApiServicio.obtenerTipos(), // Llamada al método obtenerModelos
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  // Mostrar indicador de carga mientras se esperan los datos
+                  return const CircularProgressIndicator();
+                } else if (snapshot.hasError) {
+                  // Mostrar mensaje de error si ocurre un problema
+                  return const Text(
+                    'Error al cargar tipos',
+                    style: TextStyle(color: Colors.white),
+                  );
+                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  // Manejar caso donde no hay datos
+                  return const Text(
+                    'No hay tipos disponibles',
+                    style: TextStyle(color: Colors.white),
+                  );
+                }
+
+                // Crear lista de DropdownMenuItem con los modelos obtenidos
+                List<DropdownMenuItem<String>> items = snapshot.data!
+                    .map((tipos) => DropdownMenuItem(
+                          value: tipos,
+                          child: Text(
+                            tipos,
+                            style: const TextStyle(color: Colors.white),
+                          ),
+                        ))
+                    .toList();
+                  return DropdownButtonFormField(
                     decoration: const InputDecoration(
                       labelText: 'Tipo de Vehículo:',
                       labelStyle: TextStyle(
@@ -220,22 +298,14 @@ class MainScreen extends StatelessWidget {
                         const Color(0xFF2B193E), // Fondo del desplegable
                     style: const TextStyle(
                         color: Colors.white), // Color del texto seleccionado
-                    items: const [
-                      DropdownMenuItem(
-                        value: 'tipo1',
-                        child: Text('SUV',
-                            style:
-                                TextStyle(color: Colors.white)), // Texto blanco
-                      ),
-                      DropdownMenuItem(
-                        value: 'tipoa2',
-                        child: Text('Sedán',
-                            style: TextStyle(color: Colors.white)),
-                      ),
-                    ],
+                    items: items,
                     onChanged: (value) {},
+                  );
+                  },
                   ),
+
                   const SizedBox(height: 20),
+
                   ElevatedButton(
                     onPressed: () {},
                     style: ElevatedButton.styleFrom(

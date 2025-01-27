@@ -34,8 +34,8 @@ class LoginScreen extends StatelessWidget {
               ),
               const SizedBox(height: 30),
               const SizedBox(
-                width: 200, // Ancho de la imagen
-                height: 120, // Alto de la imagen
+                width: 120, // Ancho de la imagen
+                height: 200, // Alto de la imagen
                 child: Image(
                   image: NetworkImage('https://i.postimg.cc/jqpcFJZj/Logo.png'),
                   fit: BoxFit.contain, // Asegura que la imagen cubra el área
