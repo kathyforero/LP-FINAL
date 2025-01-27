@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../Configuraciones/Usuario.dart';
 
 // Pantalla Mis Favoritos
 class MisFavoritosScreen extends StatelessWidget {
@@ -26,7 +27,7 @@ class MisFavoritosScreen extends StatelessWidget {
 
               // Texto centrado
               Text(
-                'Bienvenido a tus favoritos, usuario!',
+                'Bienvenido a tus favoritos, ${Usuario.instancia.getNombre}!',
                 style: const TextStyle(
                   color: Colors.white,
                   fontSize: 20,

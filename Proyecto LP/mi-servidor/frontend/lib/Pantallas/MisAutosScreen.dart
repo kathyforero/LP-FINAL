@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../Configuraciones/Usuario.dart';
 
 // Pantalla Mis Autos
 class MisAutosScreen extends StatelessWidget {
@@ -26,7 +27,7 @@ class MisAutosScreen extends StatelessWidget {
 
               // Texto centrado
               Text(
-                'Bienvenido al gestor de autos, usuario!',
+                'Bienvenido al gestor de autos, ${Usuario.instancia.getNombre}!',
                 style: const TextStyle(
                   color: Colors.white,
                   fontSize: 20,

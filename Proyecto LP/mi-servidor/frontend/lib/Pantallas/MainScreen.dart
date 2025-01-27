@@ -10,11 +10,20 @@ class MainScreen extends StatefulWidget {
 
   @override
   State<MainScreen> createState() => _MainScreenState();
-  }
+}
 
-  class _MainScreenState extends State<MainScreen> {
-    bool isLoading = true; // Bandera para verificar si está cargando
-    String? nombreUsuario;
+class _MainScreenState extends State<MainScreen> {
+  String? _marcaSeleccionada;
+  String? _modeloSeleccionado;
+  String? _tipoSeleccionado;
+
+  TextEditingController _controladorKmDesde = TextEditingController();
+  TextEditingController _controladorKmHasta = TextEditingController();
+  TextEditingController _controladorPrecioDesde = TextEditingController();
+  TextEditingController _controladorPrecioHasta = TextEditingController();
+
+  bool isLoading = true; // Bandera para verificar si está cargando
+  String? nombreUsuario;
 
   @override
   void initState() {
@@ -22,10 +31,9 @@ class MainScreen extends StatefulWidget {
     cargarUsuario();
   }
 
-
   Future<void> cargarUsuario() async {
     // Simula tiempo de carga o espera a datos válidos
-    await Future.delayed(const Duration(seconds: 1)); 
+    await Future.delayed(const Duration(seconds: 1));
     final nombre = Usuario.instancia.getNombre;
 
     if (mounted) {
@@ -35,7 +43,6 @@ class MainScreen extends StatefulWidget {
       });
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -56,25 +63,25 @@ class MainScreen extends StatefulWidget {
                   fit: BoxFit.contain,
                 ),
               ),
-               isLoading
-                ? const Text(
-                    'Cargando...',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 20,
-                      fontFamily: 'Calibri Light',
-                      fontWeight: FontWeight.bold,
+              isLoading
+                  ? const Text(
+                      'Cargando...',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 20,
+                        fontFamily: 'Calibri Light',
+                        fontWeight: FontWeight.bold,
+                      ),
+                    )
+                  : Text(
+                      'Bienvenido, $nombreUsuario!',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 20,
+                        fontFamily: 'Calibri Light',
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  )
-                : Text(
-                'Bienvenido, $nombreUsuario!',
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 20,
-                  fontFamily: 'Calibri Light',
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
 
               // Botones en el lado derecho
               Row(
@@ -114,8 +121,10 @@ class MainScreen extends StatefulWidget {
             padding: const EdgeInsets.all(16.0),
             child: Center(
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.center, // Centra verticalmente
-                crossAxisAlignment: CrossAxisAlignment.center, // Centra horizontalmente
+                mainAxisAlignment:
+                    MainAxisAlignment.center, // Centra verticalmente
+                crossAxisAlignment:
+                    CrossAxisAlignment.center, // Centra horizontalmente
                 children: [
                   const Text(
                     'Filtros',
@@ -125,123 +134,139 @@ class MainScreen extends StatefulWidget {
                         color: Colors.white),
                   ),
                   const SizedBox(height: 10),
+                  FutureBuilder<List<String>>(
+                    // FutureBuilder para obtener los modelos desde la API
+                    future: ApiServicio
+                        .obtenerMarcas(), // Llamada al método obtenerModelos
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        // Mostrar indicador de carga mientras se esperan los datos
+                        return const CircularProgressIndicator();
+                      } else if (snapshot.hasError) {
+                        // Mostrar mensaje de error si ocurre un problema
+                        return const Text(
+                          'Error al cargar marcas',
+                          style: TextStyle(color: Colors.white),
+                        );
+                      } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                        // Manejar caso donde no hay datos
+                        return const Text(
+                          'No hay marcas disponibles',
+                          style: TextStyle(color: Colors.white),
+                        );
+                      }
 
-                  FutureBuilder<List<String>>( // FutureBuilder para obtener los modelos desde la API
-              future: ApiServicio.obtenerMarcas(), // Llamada al método obtenerModelos
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  // Mostrar indicador de carga mientras se esperan los datos
-                  return const CircularProgressIndicator();
-                } else if (snapshot.hasError) {
-                  // Mostrar mensaje de error si ocurre un problema
-                  return const Text(
-                    'Error al cargar marcas',
-                    style: TextStyle(color: Colors.white),
-                  );
-                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  // Manejar caso donde no hay datos
-                  return const Text(
-                    'No hay marcas disponibles',
-                    style: TextStyle(color: Colors.white),
-                  );
-                }
-
-                // Crear lista de DropdownMenuItem con los modelos obtenidos
-                List<DropdownMenuItem<String>> items = snapshot.data!
-                    .map((marca) => DropdownMenuItem(
-                          value: marca,
-                          child: Text(
-                            marca,
-                            style: const TextStyle(color: Colors.white),
+                      // Crear lista de DropdownMenuItem con los modelos obtenidos
+                      List<DropdownMenuItem<String>> items = snapshot.data!
+                          .map((marca) => DropdownMenuItem(
+                                value: marca,
+                                child: Text(
+                                  marca,
+                                  style: const TextStyle(color: Colors.white),
+                                ),
+                              ))
+                          .toList();
+                      return DropdownButtonFormField(
+                        decoration: const InputDecoration(
+                          labelText: 'Marca',
+                          labelStyle: TextStyle(
+                              color: Colors.white), // Color de la etiqueta
+                          enabledBorder: OutlineInputBorder(
+                            borderSide:
+                                BorderSide(color: Colors.white), // Borde blanco
                           ),
-                        ))
-                    .toList();
-                    return DropdownButtonFormField(
-                    decoration: const InputDecoration(
-                      labelText: 'Marca',
-                      labelStyle: TextStyle(
-                          color: Colors.white), // Color de la etiqueta
-                      enabledBorder: OutlineInputBorder(
-                        borderSide:
-                            BorderSide(color: Colors.white), // Borde blanco
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(
-                            color: Colors.purple), // Borde al seleccionar
-                      ),
-                    ),
-                    dropdownColor:
-                        const Color(0xFF2B193E), // Fondo del desplegable
-                    style: const TextStyle(
-                        color: Colors.white), // Color del texto seleccionado
-                    items: items,
-                    onChanged: (value) {},
-                  );
-                  },
-                  ),
-
-                  const SizedBox(height: 10),
-
-                  FutureBuilder<List<String>>( // FutureBuilder para obtener los modelos desde la API
-              future: ApiServicio.obtenerModelos(), // Llamada al método obtenerModelos
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  // Mostrar indicador de carga mientras se esperan los datos
-                  return const CircularProgressIndicator();
-                } else if (snapshot.hasError) {
-                  // Mostrar mensaje de error si ocurre un problema
-                  return const Text(
-                    'Error al cargar modelos',
-                    style: TextStyle(color: Colors.white),
-                  );
-                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  // Manejar caso donde no hay datos
-                  return const Text(
-                    'No hay modelos disponibles',
-                    style: TextStyle(color: Colors.white),
-                  );
-                }
-
-                // Crear lista de DropdownMenuItem con los modelos obtenidos
-                List<DropdownMenuItem<String>> items = snapshot.data!
-                    .map((modelo) => DropdownMenuItem(
-                          value: modelo,
-                          child: Text(
-                            modelo,
-                            style: const TextStyle(color: Colors.white),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                                color: Colors.purple), // Borde al seleccionar
                           ),
-                        ))
-                    .toList();
-                    return DropdownButtonFormField(
-                    decoration: const InputDecoration(
-                      labelText: 'Modelo',
-                      labelStyle: TextStyle(
-                          color: Colors.white), // Color de la etiqueta
-                      enabledBorder: OutlineInputBorder(
-                        borderSide:
-                            BorderSide(color: Colors.white), // Borde blanco
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(
-                            color: Colors.purple), // Borde al seleccionar
-                      ),
-                    ),
-                    dropdownColor:
-                        const Color(0xFF2B193E), // Fondo del desplegable
-                    style: const TextStyle(
-                        color: Colors.white), // Color del texto seleccionado
-                    items: items,
-                    onChanged: (value) {},
-                  );
-                  },
+                        ),
+                        dropdownColor:
+                            const Color(0xFF2B193E), // Fondo del desplegable
+                        style: const TextStyle(
+                            color:
+                                Colors.white), // Color del texto seleccionado
+                        value: _marcaSeleccionada,
+                        items: items,
+                        onChanged: (value) {
+                          setState(() {
+                            _marcaSeleccionada = value;
+                            _modeloSeleccionado = null;
+                          });
+                        },
+                      );
+                    },
                   ),
-
                   const SizedBox(height: 10),
+                  if (_marcaSeleccionada != null)
+                    FutureBuilder<List<String>>(
+                      // FutureBuilder para obtener los modelos desde la API
+                      future: ApiServicio.obtenerModelos(
+                          _marcaSeleccionada!), // Llamada al método obtenerModelos
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          // Mostrar indicador de carga mientras se esperan los datos
+                          return const CircularProgressIndicator();
+                        } else if (snapshot.hasError) {
+                          // Mostrar mensaje de error si ocurre un problema
+                          return const Text(
+                            'Error al cargar modelos',
+                            style: TextStyle(color: Colors.white),
+                          );
+                        } else if (!snapshot.hasData ||
+                            snapshot.data!.isEmpty) {
+                          // Manejar caso donde no hay datos
+                          return const Text(
+                            'No hay modelos disponibles',
+                            style: TextStyle(color: Colors.white),
+                          );
+                        }
 
+                        // Crear lista de DropdownMenuItem con los modelos obtenidos
+                        List<DropdownMenuItem<String>> items = snapshot.data!
+                            .map((modelo) => DropdownMenuItem(
+                                  value: modelo,
+                                  child: Text(
+                                    modelo,
+                                    style: const TextStyle(color: Colors.white),
+                                  ),
+                                ))
+                            .toList();
+                        return DropdownButtonFormField(
+                          decoration: const InputDecoration(
+                            labelText: 'Modelo',
+                            labelStyle: TextStyle(
+                                color: Colors.white), // Color de la etiqueta
+                            enabledBorder: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                  color: Colors.white), // Borde blanco
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                  color: Colors.purple), // Borde al seleccionar
+                            ),
+                          ),
+                          dropdownColor:
+                              const Color(0xFF2B193E), // Fondo del desplegable
+                          style: const TextStyle(
+                              color:
+                                  Colors.white), // Color del texto seleccionado
+                          value: _modeloSeleccionado,
+                          items: items,
+                          onChanged: (value) {
+                            setState(() {
+                              _modeloSeleccionado = value;
+                            });
+                          },
+                        );
+                      },
+                    ),
+                  const SizedBox(height: 10),
                   Row(
                     children: [
                       Flexible(
                         child: TextFormField(
+                          controller: _controladorKmDesde,
                           decoration: const InputDecoration(
                               labelText: 'Kilometraje Desde',
                               labelStyle: TextStyle(color: Colors.white)),
@@ -252,6 +277,7 @@ class MainScreen extends StatefulWidget {
                       const SizedBox(width: 10),
                       Flexible(
                         child: TextFormField(
+                          controller: _controladorKmHasta,
                           decoration: const InputDecoration(
                               labelText: 'Kilometraje Hasta',
                               labelStyle: TextStyle(color: Colors.white)),
@@ -266,6 +292,7 @@ class MainScreen extends StatefulWidget {
                     children: [
                       Flexible(
                         child: TextFormField(
+                          controller: _controladorPrecioDesde,
                           decoration: const InputDecoration(
                               labelText: 'Precio Desde',
                               labelStyle: TextStyle(color: Colors.white)),
@@ -276,6 +303,7 @@ class MainScreen extends StatefulWidget {
                       const SizedBox(width: 10),
                       Flexible(
                         child: TextFormField(
+                          controller: _controladorPrecioHasta,
                           decoration: const InputDecoration(
                               labelText: 'Precio Hasta',
                               labelStyle: TextStyle(color: Colors.white)),
@@ -285,65 +313,69 @@ class MainScreen extends StatefulWidget {
                       ),
                     ],
                   ),
-
                   const SizedBox(height: 10),
+                  FutureBuilder<List<String>>(
+                    // FutureBuilder para obtener los modelos desde la API
+                    future: ApiServicio
+                        .obtenerTipos(), // Llamada al método obtenerModelos
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        // Mostrar indicador de carga mientras se esperan los datos
+                        return const CircularProgressIndicator();
+                      } else if (snapshot.hasError) {
+                        // Mostrar mensaje de error si ocurre un problema
+                        return const Text(
+                          'Error al cargar tipos',
+                          style: TextStyle(color: Colors.white),
+                        );
+                      } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                        // Manejar caso donde no hay datos
+                        return const Text(
+                          'No hay tipos disponibles',
+                          style: TextStyle(color: Colors.white),
+                        );
+                      }
 
-                  FutureBuilder<List<String>>( // FutureBuilder para obtener los modelos desde la API
-              future: ApiServicio.obtenerTipos(), // Llamada al método obtenerModelos
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  // Mostrar indicador de carga mientras se esperan los datos
-                  return const CircularProgressIndicator();
-                } else if (snapshot.hasError) {
-                  // Mostrar mensaje de error si ocurre un problema
-                  return const Text(
-                    'Error al cargar tipos',
-                    style: TextStyle(color: Colors.white),
-                  );
-                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  // Manejar caso donde no hay datos
-                  return const Text(
-                    'No hay tipos disponibles',
-                    style: TextStyle(color: Colors.white),
-                  );
-                }
-
-                // Crear lista de DropdownMenuItem con los modelos obtenidos
-                List<DropdownMenuItem<String>> items = snapshot.data!
-                    .map((tipos) => DropdownMenuItem(
-                          value: tipos,
-                          child: Text(
-                            tipos,
-                            style: const TextStyle(color: Colors.white),
+                      // Crear lista de DropdownMenuItem con los modelos obtenidos
+                      List<DropdownMenuItem<String>> items = snapshot.data!
+                          .map((tipos) => DropdownMenuItem(
+                                value: tipos,
+                                child: Text(
+                                  tipos,
+                                  style: const TextStyle(color: Colors.white),
+                                ),
+                              ))
+                          .toList();
+                      return DropdownButtonFormField(
+                        decoration: const InputDecoration(
+                          labelText: 'Tipo de Vehículo:',
+                          labelStyle: TextStyle(
+                              color: Colors.white), // Color de la etiqueta
+                          enabledBorder: OutlineInputBorder(
+                            borderSide:
+                                BorderSide(color: Colors.white), // Borde blanco
                           ),
-                        ))
-                    .toList();
-                  return DropdownButtonFormField(
-                    decoration: const InputDecoration(
-                      labelText: 'Tipo de Vehículo:',
-                      labelStyle: TextStyle(
-                          color: Colors.white), // Color de la etiqueta
-                      enabledBorder: OutlineInputBorder(
-                        borderSide:
-                            BorderSide(color: Colors.white), // Borde blanco
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(
-                            color: Colors.purple), // Borde al seleccionar
-                      ),
-                    ),
-                    dropdownColor:
-                        const Color(0xFF2B193E), // Fondo del desplegable
-                    style: const TextStyle(
-                        color: Colors.white), // Color del texto seleccionado
-                    items: items,
-                    onChanged: (value) {},
-                  );
-                  },
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                                color: Colors.purple), // Borde al seleccionar
+                          ),
+                        ),
+                        dropdownColor:
+                            const Color(0xFF2B193E), // Fondo del desplegable
+                        style: const TextStyle(
+                            color:
+                                Colors.white), // Color del texto seleccionado
+                        items: items,
+                        value: _tipoSeleccionado,
+                        onChanged: (value) {
+                          setState(() {
+                            _tipoSeleccionado = value;
+                          });
+                        },
+                      );
+                    },
                   ),
-
                   const SizedBox(height: 20),
-
                   ElevatedButton(
                     onPressed: () {},
                     style: ElevatedButton.styleFrom(
@@ -357,7 +389,22 @@ class MainScreen extends StatefulWidget {
                   ),
                   const SizedBox(height: 10),
                   GestureDetector(
-                    onTap: () {},
+                    onTap: () {
+                      setState(() {
+                        setState(() {
+                          _marcaSeleccionada =
+                              null; // Restablecer marca seleccionada
+                          _modeloSeleccionado = null;
+                          _tipoSeleccionado =
+                              null; // Restablecer modelo seleccionado
+                          _controladorKmDesde.clear();
+                          _controladorKmHasta.clear();
+                          _controladorPrecioDesde.clear();
+                          _controladorPrecioHasta
+                              .clear(); // Limpiar el TextFormField
+                        });
+                      });
+                    },
                     child: const SizedBox(
                       width: 45, // Ancho de la imagen
                       height: 47, // Alto de la imagen
@@ -408,14 +455,14 @@ class MainScreen extends StatefulWidget {
                                     .white), // Color del texto seleccionado
                             items: const [
                               DropdownMenuItem(
-                                value: 'tipo1',
-                                child: Text('Sedán',
+                                value: 'criterio1',
+                                child: Text('Precio',
                                     style: TextStyle(
                                         color: Colors.white)), // Texto blanco
                               ),
                               DropdownMenuItem(
-                                value: 'tipo2',
-                                child: Text('SUV',
+                                value: 'criterio2',
+                                child: Text('Kilometraje',
                                     style: TextStyle(color: Colors.white)),
                               ),
                             ],

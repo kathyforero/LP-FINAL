@@ -58,8 +58,8 @@ class ApiServicio {
     }
 }
 
-  static Future<List<String>> obtenerModelos() async {
-    final url = Uri.parse('${urlBase}enums/modelos');
+  static Future<List<String>> obtenerModelos(String marca) async {
+    final url = Uri.parse('${urlBase}enums/modelos/${marca}');
     
     try {
       final response = await http.get(url);
