@@ -31,7 +31,7 @@ class CrearAutoScreen extends StatelessWidget {
 
                 // Texto centrado
                 Text(
-                  'Bienvenido al creador de vehículos, usuario!',
+                  'Bienvenido al creador de vehículos, ${Usuario.instancia.getNombre}!',
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 20,
