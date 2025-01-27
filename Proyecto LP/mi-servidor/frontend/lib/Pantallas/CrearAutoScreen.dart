@@ -1,12 +1,59 @@
+import 'dart:io';
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 
 import '../Configuraciones/Usuario.dart';
 
 // Crear Autos
-class CrearAutoScreen extends StatelessWidget {  
+class CrearAutoScreen extends StatefulWidget {  
 
   const CrearAutoScreen({super.key});
+
+  @override
+  State<CrearAutoScreen> createState() => _CrearAutoScreenState();
+  }
+
+  class _CrearAutoScreenState extends State<CrearAutoScreen> {
+    final List<Uint8List> _fotosSeleccionadas = [];
+     int indiceActual = 0;
+  
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  Future<void> seleccionarFotos() async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles();
+
+    if (result != null && result.files.single.bytes != null) {
+      setState(() {
+        _fotosSeleccionadas.add(result.files.single.bytes!); // Almacena los bytes
+        if (_fotosSeleccionadas.length == 1) {
+          indiceActual = 0; // Reinicia al agregar la primera imagen
+        }
+      });
+    }
+  }
+
+
+
+  void imagenAnterior() {
+    setState(() {
+      if (indiceActual > 0) {
+        indiceActual--;
+      }
+    });
+  }
+
+  void imagenSiguiente() {
+    setState(() {
+      if (indiceActual < _fotosSeleccionadas.length - 1) {
+        indiceActual++;
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -84,50 +131,36 @@ class CrearAutoScreen extends StatelessWidget {
 
                                   // Carga tu imagen ************************************************
                                   ElevatedButton(
-                                    onPressed: () async {
-                                      // Abre el explorador de archivos para seleccionar un archivo
-                                      FilePickerResult? result =
-                                          await FilePicker.platform.pickFiles();
-
-                                      if (result != null) {
-                                        // Si el usuario selecciona un archivo
-                                        String? filePath =
-                                            result.files.single.path;
-                                        print(
-                                            "Archivo seleccionado: $filePath");
-                                        // Aquí puedes usar el archivo seleccionado (por ejemplo, cargarlo o procesarlo)
-                                      } else {
-                                        // Si el usuario cancela la selección
-                                        print(
-                                            "No se seleccionó ningún archivo.");
-                                      }
-                                    },
+                                    onPressed: seleccionarFotos,
                                     style: ElevatedButton.styleFrom(
-                                      backgroundColor: const Color(
-                                          0xFF9576DA), // Fondo del botón
-                                      foregroundColor:
-                                          Colors.white, // Color del texto
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 20, vertical: 10),
+                                      backgroundColor: const Color(0xFF9576DA), // Fondo del botón
+                                      foregroundColor: Colors.white, // Color del texto
+                                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                                     ),
                                     child: const Text('Carga Tu Imagen'),
                                   ),
-                                ],
+                                ],  
                               ),
 
                               SizedBox(height: 10),
-
-                              // Imagen de ejemplo ************************************************
+                              
+                              //Presentación de imagenes
                               SizedBox(
-                                width: 650, // Ancho de la imagen
-                                height: 576, // Alto de la imagen
-                                child: Image(
-                                  image: NetworkImage(
-                                      'https://i.postimg.cc/qRYLrN7X/preview.png'),
-                                  fit: BoxFit
-                                      .contain, // Asegura que la imagen cubra el área
-                                ),
+                                width: 650,
+                                height: 576,
+                                child: _fotosSeleccionadas.isNotEmpty
+                                    ? Image.memory(
+                                        _fotosSeleccionadas[indiceActual], // Muestra la imagen actual desde los bytes
+                                        fit: BoxFit.contain,
+                                      )
+                                    : const Image(
+                                        image: NetworkImage(
+                                            'https://i.postimg.cc/qRYLrN7X/preview.png'), // Placeholder
+                                        fit: BoxFit.contain,
+                                      ),
                               ),
+
+
 
                               SizedBox(height: 10),
 
@@ -135,50 +168,56 @@ class CrearAutoScreen extends StatelessWidget {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   // Boton izquierda ************************************************
-                                  SizedBox(
-                                    width: 50, // Ancho de la imagen
-                                    height: 50, // Alto de la imagen
+                                  MouseRegion(
+                                    cursor: SystemMouseCursors.click, // Cambia el cursor a mano
                                     child: GestureDetector(
                                       onTap: () {
-                                        print("Imagen presionada");
-                                        // Lógica al presionar el botón
+                                        if (indiceActual > 0) {
+                                          imagenAnterior();
+                                        }
                                       },
                                       child: Image(
+                                        width: 50,
+                                        height: 50,
                                         image: NetworkImage(
                                             'https://i.postimg.cc/bY7TFSWq/izquierda.png'),
-                                        fit: BoxFit
-                                            .contain, // Asegura que la imagen cubra el área
+                                        fit: BoxFit.contain,
                                       ),
                                     ),
                                   ),
 
                                   SizedBox(width: 30),
 
-                                  const Text(
-                                    '0/0',
-                                    style: TextStyle(
+                                  
+                                    Text(
+                                      _fotosSeleccionadas.isNotEmpty
+                                          ? '${indiceActual + 1} / ${_fotosSeleccionadas.length}'
+                                          : '0/0',
+                                      style: const TextStyle(
                                         fontFamily: 'Century Gothic',
                                         fontSize: 30,
                                         fontWeight: FontWeight.bold,
-                                        color: Colors.white),
-                                  ),
+                                        color: Colors.white,
+                                      ),
+                                    ),
 
                                   SizedBox(width: 30),
 
                                   // Boton derecha ************************************************
-                                  SizedBox(
-                                    width: 50, // Ancho de la imagen
-                                    height: 50, // Alto de la imagen
+                                  MouseRegion(
+                                    cursor: SystemMouseCursors.click, // Cambia el cursor a mano
                                     child: GestureDetector(
                                       onTap: () {
-                                        print("Imagen presionada");
-                                        // Lógica al presionar el botón
+                                        if (indiceActual < _fotosSeleccionadas.length - 1) {
+                                          imagenSiguiente();
+                                        }
                                       },
                                       child: Image(
+                                        width: 50,
+                                        height: 50,
                                         image: NetworkImage(
                                             'https://i.postimg.cc/qM2LfMHy/derecha.png'),
-                                        fit: BoxFit
-                                            .contain, // Asegura que la imagen cubra el área
+                                        fit: BoxFit.contain,
                                       ),
                                     ),
                                   ),
@@ -191,6 +230,7 @@ class CrearAutoScreen extends StatelessWidget {
                         // Atributos del Auto
                         Expanded(
                           flex: 1,
+                            child: SingleChildScrollView(
                           child: Container(
                             color: const Color(0xFF2B193E),
                             padding: const EdgeInsets.all(16.0),
@@ -750,6 +790,37 @@ class CrearAutoScreen extends StatelessWidget {
 
                                   // Guardar ************************************************
                                   ElevatedButton(
+                                    onPressed: () async {
+                                      if (_fotosSeleccionadas.isEmpty) {
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          const SnackBar(content: Text('Por favor selecciona al menos una foto.')),
+                                        );
+                                        return;
+                                      }
+
+                                      // Subir las fotos al bucket y obtener los IDs
+                                      // Simula subir las fotos al bucket y obtener IDs
+                                        List<String> idsFotos = [];
+                                      //for (Uint8List foto in _fotosSeleccionadas) {
+                                        // Aquí simulas el envío de la foto al backend o bucket
+                                        // Por ejemplo, podrías convertir los bytes en un string base64 si es necesario
+                                        //String? idFoto = await subirFotoAlBucket(foto); // Función para subir la foto
+                                        //if (idFoto != null) {
+                                        //  idsFotos.add(idFoto);
+                                        //}
+                                      //}
+
+                                      // Aquí puedes llamar al backend para guardar el auto con los IDs de las fotos
+                                      //print('IDs de las fotos guardadas: $idsFotos');
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: const Color(0xFF9576DA),
+                                      foregroundColor: Colors.white,
+                                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                                    ),
+                                    child: const Text('Guardar'),
+                                  ),
+                                  ElevatedButton(
                                     onPressed: () {},
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: const Color(
@@ -766,6 +837,7 @@ class CrearAutoScreen extends StatelessWidget {
                             ),
                           ),
                         ),
+                        ),
                       ],
                     ),
                   ),
@@ -776,3 +848,4 @@ class CrearAutoScreen extends StatelessWidget {
         ));
   }
 }
+
