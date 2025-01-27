@@ -10,6 +10,7 @@ class MainScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+          automaticallyImplyLeading: false,
           toolbarHeight: 130.0, // Altura del AppBar
           backgroundColor: const Color(0xFF0D050E),
           title: Row(
