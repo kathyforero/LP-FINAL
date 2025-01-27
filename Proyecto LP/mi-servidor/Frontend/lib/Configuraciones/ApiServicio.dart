@@ -1,4 +1,5 @@
 import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 
 class ApiServicio {
@@ -8,15 +9,15 @@ class ApiServicio {
   
 
     static Future<bool> autenticarUsuario(String correo, String contrasena) async {
-    final url = Uri.parse(urlBase + 'usuarios/autenticar?correo=$correo&contrasena=$contrasena');
+    final url = Uri.parse(urlBase+'usuarios/autenticar'); // Reemplaza con la URL de tu backend
 
     try {
       final response = await http.post(
         url,
         headers: {'Content-Type': 'application/json'},
+        body: json.encode({'correo': correo, 'contrasena': contrasena}),
       );
 
-      print(response.statusCode);
       if (response.statusCode == 200) {
         // El backend retornó éxito
         return true;
