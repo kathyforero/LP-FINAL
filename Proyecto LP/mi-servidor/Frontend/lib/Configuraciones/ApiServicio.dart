@@ -20,6 +20,8 @@ class ApiServicio {
 
       if (response.statusCode == 200) {
         // El backend retornó éxito
+
+
         return true;
       } else if (response.statusCode == 404) {
         
@@ -36,5 +38,27 @@ class ApiServicio {
     }
   }
 
+  static Future<Map<String, dynamic>?> obtenerUsuario(String usuario) async {
+  final url = Uri.parse(urlBase+"usuarios/$usuario"); // Construir la URL
 
+  try {
+    final response = await http.get(url);
+    if (response.statusCode == 200) {
+      // Decodifica el JSON y retorna los datos
+      final Map<String, dynamic> datosUsuario = json.decode(response.body);
+      return datosUsuario; // Retorna el JSON como un mapa
+    } else if (response.statusCode == 404) {
+      return null;
+    } else {
+      return null;
+    }
+  } catch (e) {
+    return null;
+  }
+}
+
+
+
+
+ 
 }

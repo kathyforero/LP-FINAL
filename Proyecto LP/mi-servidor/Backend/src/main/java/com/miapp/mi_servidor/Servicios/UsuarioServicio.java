@@ -56,10 +56,6 @@ public class UsuarioServicio {
     public boolean autenticarUsuario(String correo, String contrasena){
         Usuario usuario = buscarUsuarioPorCorreo(correo);
         if (usuario != null) {
-            System.out.println(usuario.getCorreo());
-            System.out.println(correo);
-            System.out.println(HashUtil.md5(contrasena));
-            System.out.println(usuario.getContrasena());
             return usuario.getContrasena().equals(HashUtil.md5(contrasena));
         }
         return false;

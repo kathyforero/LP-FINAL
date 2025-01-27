@@ -1,10 +1,40 @@
 import 'package:flutter/material.dart';
+import '../Configuraciones/Usuario.dart';
 import 'CrearAutoScreen.dart';
 import '../Widgets/MyPopUpMenu.dart';
 
 // Pantalla principal (nueva)
-class MainScreen extends StatelessWidget {
+class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
+
+  @override
+  State<MainScreen> createState() => _MainScreenState();
+  }
+
+  class _MainScreenState extends State<MainScreen> {
+    bool isLoading = true; // Bandera para verificar si está cargando
+    String? nombreUsuario;
+
+  @override
+  void initState() {
+    super.initState();
+    cargarUsuario();
+  }
+
+
+  Future<void> cargarUsuario() async {
+    // Simula tiempo de carga o espera a datos válidos
+    await Future.delayed(const Duration(seconds: 1)); 
+    final nombre = Usuario.instancia.getNombre;
+
+    if (mounted) {
+      setState(() {
+        nombreUsuario = nombre ?? "Invitado"; // Si es null, muestra "Invitado"
+        isLoading = false; // Indica que la carga ha terminado
+      });
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -25,10 +55,18 @@ class MainScreen extends StatelessWidget {
                   fit: BoxFit.contain,
                 ),
               ),
-
-              // Texto centrado
-              Text(
-                'Bienvenido, usuario!',
+               isLoading
+                ? const Text(
+                    'Cargando...',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 20,
+                      fontFamily: 'Calibri Light',
+                      fontWeight: FontWeight.bold,
+                    ),
+                  )
+                : Text(
+                'Bienvenido, $nombreUsuario!',
                 style: const TextStyle(
                   color: Colors.white,
                   fontSize: 20,
