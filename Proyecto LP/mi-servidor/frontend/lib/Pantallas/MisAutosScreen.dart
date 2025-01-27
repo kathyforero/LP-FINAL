@@ -8,6 +8,7 @@ class MisAutosScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+          iconTheme: IconThemeData(color: Colors.white),
           toolbarHeight: 130.0, // Altura del AppBar
           backgroundColor: const Color(0xFF0D050E),
           title: Row(
