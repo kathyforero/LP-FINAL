@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 
+import '../Configuraciones/Usuario.dart';
+
 // Crear Autos
 class CrearAutoScreen extends StatelessWidget {
   
@@ -28,7 +30,7 @@ class CrearAutoScreen extends StatelessWidget {
 
               // Texto centrado
               Text(
-                'Bienvenido al creador de vehículos, usuario!',
+                'Bienvenido al creador de vehículos, ${Usuario.instancia.getNombre}!',
                 style: const TextStyle(
                   color: Colors.white,
                   fontSize: 20,
