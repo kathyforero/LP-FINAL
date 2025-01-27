@@ -188,7 +188,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               'Las contraseñas no coinciden!',
                               Colors.red);
                           return;
-                        }                       
+                        }  
+                        if (_isChecked==false) {
+                          SnackBarHelper.showSnackBar(
+                              context,
+                              'Acepte los términos y condiciones!',
+                              Colors.red);
+                          return;
+                        }                          
 
                         try {
                           final capturedContext = context;
