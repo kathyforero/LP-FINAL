@@ -75,7 +75,8 @@ class MainScreen extends StatelessWidget {
             padding: const EdgeInsets.all(16.0),
             child: Center(
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center, // Centra verticalmente
+                crossAxisAlignment: CrossAxisAlignment.center, // Centra horizontalmente
                 children: [
                   const Text(
                     'Filtros',

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:file_picker/file_picker.dart';
 
 // Crear Autos
 class CrearAutoScreen extends StatelessWidget {
@@ -41,8 +42,7 @@ class CrearAutoScreen extends StatelessWidget {
           // Main content
           Expanded(
             child: Column(
-              children: [
-                // Sorting row
+              children: [                
                 Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Row(
@@ -51,14 +51,127 @@ class CrearAutoScreen extends StatelessWidget {
                 Expanded(
                   flex: 1,
                   child: Column(
-                  children: [
-                    Row(children: [
+                    mainAxisAlignment: MainAxisAlignment.center, // Centra verticalmente
+                    crossAxisAlignment: CrossAxisAlignment.center, // Centra horizontalmente
+                    children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+
+                      // Tachito de basura ************************************************  
+                      SizedBox(
+                        width: 45, // Ancho de la imagen
+                        height: 50, // Alto de la imagen
+                        child:
+                        GestureDetector(
+                        onTap: () {
+                          print("Imagen presionada");
+                          // Lógica al presionar el botón
+                        },
+                        child: Image(
+                          image: NetworkImage(
+                              'https://i.postimg.cc/y6gjPyff/Trash.png'),
+                          fit: BoxFit.contain, // Asegura que la imagen cubra el área
+                        ),
+                      ),
+                      ),
+
+                      SizedBox(width: 50),
+
+                      // Carga tu imagen ************************************************
+                      ElevatedButton(
+                                      onPressed: () async {
+                          // Abre el explorador de archivos para seleccionar un archivo
+                          FilePickerResult? result = await FilePicker.platform.pickFiles();
+
+                          if (result != null) {
+                            // Si el usuario selecciona un archivo
+                            String? filePath = result.files.single.path;
+                            print("Archivo seleccionado: $filePath");
+                            // Aquí puedes usar el archivo seleccionado (por ejemplo, cargarlo o procesarlo)
+                          } else {
+                            // Si el usuario cancela la selección
+                            print("No se seleccionó ningún archivo.");
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor:
+                              const Color(0xFF9576DA), // Fondo del botón
+                          foregroundColor: Colors.white, // Color del texto
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 20, vertical: 10),
+                        ),
+                        child: const Text('Carga Tu Imagen'),
+                      ),
 
                     ],),
 
+                    SizedBox(height: 10),
 
-                    Row(children: [
+                    // Imagen de ejemplo ************************************************
+                    SizedBox(
+                      width: 650, // Ancho de la imagen
+                      height: 576, // Alto de la imagen
+                      child:  Image(
+                        image: NetworkImage(
+                            'https://i.postimg.cc/qRYLrN7X/preview.png'),
+                        fit: BoxFit.contain, // Asegura que la imagen cubra el área
+                      ), 
+                    ),
 
+                    SizedBox(height: 10),
+
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                      // Boton izquierda ************************************************  
+                      SizedBox(
+                        width: 50, // Ancho de la imagen
+                        height: 50, // Alto de la imagen
+                        child:
+                        GestureDetector(
+                        onTap: () {
+                          print("Imagen presionada");
+                          // Lógica al presionar el botón
+                        },
+                        child: Image(
+                          image: NetworkImage(
+                              'https://i.postimg.cc/bY7TFSWq/izquierda.png'),
+                          fit: BoxFit.contain, // Asegura que la imagen cubra el área
+                        ),
+                      ),
+                      ),
+
+                      SizedBox(width: 30),
+
+                      const Text(
+                            '0/0',
+                            style: TextStyle(
+                                fontFamily: 'Century Gothic',
+                                fontSize: 30,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white),                                
+                          ),
+
+                      SizedBox(width: 30),    
+
+                      // Boton derecha ************************************************
+                      SizedBox(
+                        width: 50, // Ancho de la imagen
+                        height: 50, // Alto de la imagen
+                        child:
+                        GestureDetector(
+                        onTap: () {
+                          print("Imagen presionada");
+                          // Lógica al presionar el botón
+                        },
+                        child: Image(
+                          image: NetworkImage(
+                              'https://i.postimg.cc/qM2LfMHy/derecha.png'),
+                          fit: BoxFit.contain, // Asegura que la imagen cubra el área
+                        ),
+                      ),
+                      ),
                     ],)
                   ],
                 ),
@@ -72,21 +185,81 @@ class CrearAutoScreen extends StatelessWidget {
                 padding: const EdgeInsets.all(16.0),
                 child: Center(
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center, // Centra verticalmente
+                    crossAxisAlignment: CrossAxisAlignment.center, // Centra horizontalmente
                     children: [
-                      const Text(
-                        'Filtros',
-                        style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white),
+                      // Elementos
+                      // Placa ************************************************
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Text(
+                            'Placa:',
+                            style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white),
+                          ),
+                          const SizedBox(width: 40), 
+                          SizedBox(
+                            width: 550,
+                            child: TextFormField(
+                              decoration: const InputDecoration(
+                                  hintText: 'Ej.: ABC-123',
+                                  hintStyle: TextStyle(color: Colors.white54)),
+                              style: const TextStyle(
+                                  color: Colors.white), // Color del texto ingresado
+                            ),
+                          ),                          
+                        ],
                       ),
                       const SizedBox(height: 10),
-                      DropdownButtonFormField(
+
+                      // Precio ************************************************
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Text(
+                            'Precio:',
+                            style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white),
+                          ),
+                          const SizedBox(width: 40), 
+                          SizedBox(
+                            width: 550,
+                            child: TextFormField(
+                              decoration: const InputDecoration(
+                                  hintText: 'Ej.: 20000.00',
+                                  hintStyle: TextStyle(color: Colors.white54)),
+                              style: const TextStyle(
+                                  color: Colors.white), // Color del texto ingresado
+                            ),
+                          ),                          
+                        ],
+                      ),
+                      const SizedBox(height: 10), 
+
+                      // Marca ************************************************
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [   
+                          const Text(
+                            'Marca:',
+                            style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white),
+                          ),
+                          const SizedBox(width: 40),
+                      SizedBox(
+                        width: 550,
+                        child: DropdownButtonFormField(
                         decoration: const InputDecoration(
-                          labelText: 'Marca',
-                          labelStyle: TextStyle(
-                              color: Colors.white), // Color de la etiqueta
+                          hintText: 'Marca',
+                          hintStyle: TextStyle(
+                              color: Colors.white54), // Color de la etiqueta
                           enabledBorder: OutlineInputBorder(
                             borderSide:
                                 BorderSide(color: Colors.white), // Borde blanco
@@ -115,12 +288,28 @@ class CrearAutoScreen extends StatelessWidget {
                         ],
                         onChanged: (value) {},
                       ),
+                      )]),
                       const SizedBox(height: 10),
-                      DropdownButtonFormField(
+
+                      // Modelo ************************************************
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [   
+                          const Text(
+                            'Modelo:',
+                            style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white),
+                          ),
+                          const SizedBox(width: 40),
+                      SizedBox(
+                        width: 550,
+                        child: DropdownButtonFormField(
                         decoration: const InputDecoration(
-                          labelText: 'Modelo',
-                          labelStyle: TextStyle(
-                              color: Colors.white), // Color de la etiqueta
+                          hintText: 'Modelo',
+                          hintStyle: TextStyle(
+                              color: Colors.white54), // Color de la etiqueta
                           enabledBorder: OutlineInputBorder(
                             borderSide:
                                 BorderSide(color: Colors.white), // Borde blanco
@@ -149,60 +338,28 @@ class CrearAutoScreen extends StatelessWidget {
                         ],
                         onChanged: (value) {},
                       ),
+                      )]),
                       const SizedBox(height: 10),
+
+                      // Tipo ************************************************
                       Row(
-                        children: [
-                          Flexible(
-                            child: TextFormField(
-                              decoration: const InputDecoration(
-                                  labelText: 'Kilometraje Desde',
-                                  labelStyle: TextStyle(color: Colors.white)),
-                              style: const TextStyle(
-                                  color: Colors.white), // Color del texto ingresado
-                            ),
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [   
+                          const Text(
+                            'Tipo:',
+                            style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white),
                           ),
-                          const SizedBox(width: 10),
-                          Flexible(
-                            child: TextFormField(
-                              decoration: const InputDecoration(
-                                  labelText: 'Kilometraje Hasta',
-                                  labelStyle: TextStyle(color: Colors.white)),
-                              style: const TextStyle(
-                                  color: Colors.white), // Color del texto ingresado
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 10),
-                      Row(
-                        children: [
-                          Flexible(
-                            child: TextFormField(
-                              decoration: const InputDecoration(
-                                  labelText: 'Precio Desde',
-                                  labelStyle: TextStyle(color: Colors.white)),
-                              style: const TextStyle(
-                                  color: Colors.white), // Color del texto ingresado
-                            ),
-                          ),
-                          const SizedBox(width: 10),
-                          Flexible(
-                            child: TextFormField(
-                              decoration: const InputDecoration(
-                                  labelText: 'Precio Hasta',
-                                  labelStyle: TextStyle(color: Colors.white)),
-                              style: const TextStyle(
-                                  color: Colors.white), // Color del texto ingresado
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 10),
-                      DropdownButtonFormField(
+                          const SizedBox(width: 40),
+                      SizedBox(
+                        width: 550,
+                        child: DropdownButtonFormField(
                         decoration: const InputDecoration(
-                          labelText: 'Tipo de Vehículo:',
-                          labelStyle: TextStyle(
-                              color: Colors.white), // Color de la etiqueta
+                          hintText: 'Tipo',
+                          hintStyle: TextStyle(
+                              color: Colors.white54), // Color de la etiqueta
                           enabledBorder: OutlineInputBorder(
                             borderSide:
                                 BorderSide(color: Colors.white), // Borde blanco
@@ -219,21 +376,304 @@ class CrearAutoScreen extends StatelessWidget {
                         items: const [
                           DropdownMenuItem(
                             value: 'tipo1',
-                            child: Text('SUV',
+                            child: Text('Tipo 1',
                                 style:
                                     TextStyle(color: Colors.white)), // Texto blanco
                           ),
                           DropdownMenuItem(
-                            value: 'tipoa2',
-                            child: Text('Sedán',
+                            value: 'tipo2',
+                            child: Text('Tipo 2',
                                 style: TextStyle(color: Colors.white)),
                           ),
                         ],
                         onChanged: (value) {},
                       ),
-                      const SizedBox(height: 20),
+                      )]),
+                      const SizedBox(height: 10),
+
+                      // Año ************************************************
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Text(
+                            'Año:',
+                            style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white),
+                          ),
+                          const SizedBox(width: 40), 
+                          SizedBox(
+                            width: 550,
+                            child: TextFormField(
+                              decoration: const InputDecoration(
+                                  hintText: 'Ej.: 2020',
+                                  hintStyle: TextStyle(color: Colors.white54)),
+                              style: const TextStyle(
+                                  color: Colors.white), // Color del texto ingresado
+                            ),
+                          ),                          
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+
+                      // Kilometraje ************************************************
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Text(
+                            'Kilometraje:',
+                            style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white),
+                          ),
+                          const SizedBox(width: 40), 
+                          SizedBox(
+                            width: 550,
+                            child: TextFormField(
+                              decoration: const InputDecoration(
+                                  hintText: 'Ej.: 5000',
+                                  hintStyle: TextStyle(color: Colors.white54)),
+                              style: const TextStyle(
+                                  color: Colors.white), // Color del texto ingresado
+                            ),
+                          ),                          
+                        ],
+                      ),
+                      const SizedBox(height: 10),       
+
+                      // Motor ************************************************
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [   
+                          const Text(
+                            'Motor:',
+                            style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white),
+                          ),
+                          const SizedBox(width: 40),
+                      SizedBox(
+                        width: 550,
+                        child: DropdownButtonFormField(
+                        decoration: const InputDecoration(
+                          hintText: 'Motor',
+                          hintStyle: TextStyle(
+                              color: Colors.white54), // Color de la etiqueta
+                          enabledBorder: OutlineInputBorder(
+                            borderSide:
+                                BorderSide(color: Colors.white), // Borde blanco
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                                color: Colors.purple), // Borde al seleccionar
+                          ),
+                        ),
+                        dropdownColor:
+                            const Color(0xFF2B193E), // Fondo del desplegable
+                        style: const TextStyle(
+                            color: Colors.white), // Color del texto seleccionado
+                        items: const [
+                          DropdownMenuItem(
+                            value: 'motor1',
+                            child: Text('Motor 1',
+                                style:
+                                    TextStyle(color: Colors.white)), // Texto blanco
+                          ),
+                          DropdownMenuItem(
+                            value: 'motor2',
+                            child: Text('Motor 2',
+                                style: TextStyle(color: Colors.white)),
+                          ),
+                        ],
+                        onChanged: (value) {},
+                      ),
+                      )]),
+                      const SizedBox(height: 10),
+
+                      // Transmisión ************************************************
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [   
+                          const Text(
+                            'Transmisión:',
+                            style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white),
+                          ),
+                          const SizedBox(width: 40),
+                      SizedBox(
+                        width: 550,
+                        child: DropdownButtonFormField(
+                        decoration: const InputDecoration(
+                          hintText: 'Transmisión',
+                          hintStyle: TextStyle(
+                              color: Colors.white54), // Color de la etiqueta
+                          enabledBorder: OutlineInputBorder(
+                            borderSide:
+                                BorderSide(color: Colors.white), // Borde blanco
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                                color: Colors.purple), // Borde al seleccionar
+                          ),
+                        ),
+                        dropdownColor:
+                            const Color(0xFF2B193E), // Fondo del desplegable
+                        style: const TextStyle(
+                            color: Colors.white), // Color del texto seleccionado
+                        items: const [
+                          DropdownMenuItem(
+                            value: 'transmision1',
+                            child: Text('Transmisión 1',
+                                style:
+                                    TextStyle(color: Colors.white)), // Texto blanco
+                          ),
+                          DropdownMenuItem(
+                            value: 'transmision2',
+                            child: Text('Transmisión 2',
+                                style: TextStyle(color: Colors.white)),
+                          ),
+                        ],
+                        onChanged: (value) {},
+                      ),
+                      )]),
+                      const SizedBox(height: 10),
+
+                      // Peso ************************************************
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Text(
+                            'Peso:',
+                            style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white),
+                          ),
+                          const SizedBox(width: 40), 
+                          SizedBox(
+                            width: 550,
+                            child: TextFormField(
+                              decoration: const InputDecoration(
+                                  hintText: 'Peso en kg',
+                                  hintStyle: TextStyle(color: Colors.white54)),
+                              style: const TextStyle(
+                                  color: Colors.white), // Color del texto ingresado
+                            ),
+                          ),                          
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+
+                      // Ubicación ************************************************
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [   
+                          const Text(
+                            'Ubicación:',
+                            style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white),
+                          ),
+                          const SizedBox(width: 40),
+                      SizedBox(
+                        width: 550,
+                        child: DropdownButtonFormField(
+                        decoration: const InputDecoration(
+                          hintText: 'Ubicación',
+                          hintStyle: TextStyle(
+                              color: Colors.white54), // Color de la etiqueta
+                          enabledBorder: OutlineInputBorder(
+                            borderSide:
+                                BorderSide(color: Colors.white), // Borde blanco
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                                color: Colors.purple), // Borde al seleccionar
+                          ),
+                        ),
+                        dropdownColor:
+                            const Color(0xFF2B193E), // Fondo del desplegable
+                        style: const TextStyle(
+                            color: Colors.white), // Color del texto seleccionado
+                        items: const [
+                          DropdownMenuItem(
+                            value: 'ubicacion1',
+                            child: Text('Ubicación 1',
+                                style:
+                                    TextStyle(color: Colors.white)), // Texto blanco
+                          ),
+                          DropdownMenuItem(
+                            value: 'ubicacion2',
+                            child: Text('Ubicación 2',
+                                style: TextStyle(color: Colors.white)),
+                          ),
+                        ],
+                        onChanged: (value) {},
+                      ),
+                      )]),
+                      const SizedBox(height: 10),
+
+                      // Estado ************************************************
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [   
+                          const Text(
+                            'Estado:',
+                            style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white),
+                          ),
+                          const SizedBox(width: 40),
+                      SizedBox(
+                        width: 550,
+                        child: DropdownButtonFormField(
+                        decoration: const InputDecoration(
+                          hintText: 'Estado',
+                          hintStyle: TextStyle(
+                              color: Colors.white54), // Color de la etiqueta
+                          enabledBorder: OutlineInputBorder(
+                            borderSide:
+                                BorderSide(color: Colors.white), // Borde blanco
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                                color: Colors.purple), // Borde al seleccionar
+                          ),
+                        ),
+                        dropdownColor:
+                            const Color(0xFF2B193E), // Fondo del desplegable
+                        style: const TextStyle(
+                            color: Colors.white), // Color del texto seleccionado
+                        items: const [
+                          DropdownMenuItem(
+                            value: 'estado1',
+                            child: Text('Estado 1',
+                                style:
+                                    TextStyle(color: Colors.white)), // Texto blanco
+                          ),
+                          DropdownMenuItem(
+                            value: 'estado2',
+                            child: Text('Estado 2',
+                                style: TextStyle(color: Colors.white)),
+                          ),
+                        ],
+                        onChanged: (value) {},
+                      ),
+                      )]),
+                      const SizedBox(height: 30),
+
+                      // Guardar ************************************************
                       ElevatedButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          
+                        },
                         style: ElevatedButton.styleFrom(
                           backgroundColor:
                               const Color(0xFF9576DA), // Fondo del botón
@@ -241,21 +681,7 @@ class CrearAutoScreen extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(
                               horizontal: 20, vertical: 10),
                         ),
-                        child: const Text('Buscar'),
-                      ),
-                      const SizedBox(height: 10),
-                      GestureDetector(
-                        onTap: () {},
-                        child: const SizedBox(
-                          width: 45, // Ancho de la imagen
-                          height: 47, // Alto de la imagen
-                          child: Image(
-                            image: NetworkImage(
-                                'https://i.postimg.cc/TPjtkxv9/borrarfiltro.png'),
-                            fit: BoxFit
-                                .contain, // Asegura que la imagen cubra el área
-                          ),
-                        ),
+                        child: const Text('Guardar'),
                       ),
                     ],
                   ),
