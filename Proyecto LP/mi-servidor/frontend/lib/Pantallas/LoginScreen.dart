@@ -4,6 +4,7 @@ import 'MainScreen.dart';
 import 'RegisterScreen.dart';
 import '../Configuraciones/Validaciones.dart';
 import '../Configuraciones/ApiServicio.dart';
+import '../Configuraciones/Usuario.dart';
 import '../Widgets/SnackBarHelper.dart';
 
 
@@ -90,6 +91,7 @@ class LoginScreen extends StatelessWidget {
                     final autenticado = await ApiServicio.autenticarUsuario(email, password);
                     
                     if (autenticado) {
+                      Usuario.instancia.establecerUsuario(id:email);
                       Navigator.push(
                         capturedContext,
                         MaterialPageRoute(builder: (context) => MainScreen()),

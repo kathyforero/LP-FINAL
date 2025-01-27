@@ -26,7 +26,7 @@ public class UsuarioController {
     }
 
     // Obtener un usuario por ID
-    @GetMapping("/{correo}")
+    @GetMapping("/{id}")
     public ResponseEntity<Usuario> obtenerUsuarioPorId(@PathVariable String id) {
         Usuario usuario = usuarioServicio.buscarUsuarioPorCorreo(id);
         if (usuario != null) {
