@@ -1,21 +1,38 @@
-import 'dart:io';
+import 'dart:convert';
 import 'dart:typed_data';
-
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 
 import '../Configuraciones/Usuario.dart';
+import '../Configuraciones/FirebaseStorageService.dart';
+
 
 // Crear Autos
 class CrearAutoScreen extends StatefulWidget {  
-
   const CrearAutoScreen({super.key});
+
+  
 
   @override
   State<CrearAutoScreen> createState() => _CrearAutoScreenState();
   }
 
   class _CrearAutoScreenState extends State<CrearAutoScreen> {
+    final TextEditingController placaController = TextEditingController();
+  final TextEditingController precioController = TextEditingController();
+  final TextEditingController anioController = TextEditingController();
+  final TextEditingController kilometrajeController = TextEditingController();
+  final TextEditingController pesoController = TextEditingController();
+
+  // Variables para los valores seleccionados de los DropdownButton
+  String? marcaSeleccionada;
+  String? modeloSeleccionado;
+  String? tipoSeleccionado;
+  String? motorSeleccionado;
+  String? transmisionSeleccionada;
+  String? ubicacionSeleccionada;
+  String? estadoSeleccionado;
     final List<Uint8List> _fotosSeleccionadas = [];
      int indiceActual = 0;
   
@@ -29,15 +46,15 @@ class CrearAutoScreen extends StatefulWidget {
 
     if (result != null && result.files.single.bytes != null) {
       setState(() {
-        _fotosSeleccionadas.add(result.files.single.bytes!); // Almacena los bytes
+        _fotosSeleccionadas.add(result.files.single.bytes!);
         if (_fotosSeleccionadas.length == 1) {
-          indiceActual = 0; // Reinicia al agregar la primera imagen
+          indiceActual = 0;
         }
       });
     }
   }
 
-
+    	
 
   void imagenAnterior() {
     setState(() {
@@ -54,6 +71,102 @@ class CrearAutoScreen extends StatefulWidget {
       }
     });
   }
+  
+
+  Future<void> guardarAuto() async {
+    if (_fotosSeleccionadas.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Por favor selecciona al menos una imagen.')),
+      );
+      return;
+    }
+
+    FirebaseStorageService storageService = FirebaseStorageService();
+    List<String> urls = await storageService.subirFotos(_fotosSeleccionadas);
+
+    if (urls.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Error al subir imágenes.')),
+      );
+      return;
+    }
+
+    // Capturar valores desde los controladores y Dropdown
+    String placa = placaController.text.trim();
+    double? precio = double.tryParse(precioController.text.trim());
+    String? marca = marcaSeleccionada;
+    String? modelo = modeloSeleccionado;
+    String? tipo = tipoSeleccionado;
+    int? anio = int.tryParse(anioController.text.trim());
+    int? kilometraje = int.tryParse(kilometrajeController.text.trim());
+    String? motor = motorSeleccionado;
+    String? transmision = transmisionSeleccionada;
+    double? peso = double.tryParse(pesoController.text.trim());
+    String? ubicacion = ubicacionSeleccionada;
+    String? estado = estadoSeleccionado;
+    String? usuario = Usuario.instancia.getCorreo;
+
+    if (placa.isEmpty ||
+        precio == null ||
+        marca == null ||
+        modelo == null ||
+        tipo == null ||
+        anio == null ||
+        kilometraje == null ||
+        motor == null ||
+        transmision == null ||
+        peso == null ||
+        ubicacion == null ||
+        estado == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Por favor completa todos los campos.')),
+      );
+      return;
+    }
+
+    // Crear el JSON para enviar al backend
+    Map<String, dynamic> autoData = {
+      'placa': placa,
+      'precio': precio,
+      'marca': marca,
+      'modelo': modelo,
+      'tipo': tipo,
+      'anio': anio,
+      'kilometraje': kilometraje,
+      'motor': motor,
+      'transmision': transmision,
+      'peso': peso,
+      'ubicacion': ubicacion,
+      'estado': estado,
+      'usuario': usuario,
+      'fotos': urls,
+    };
+
+    try {
+      // Aquí puedes realizar el envío del auto al backend
+      // Ejemplo usando HTTP
+      final response = await http.post(
+        Uri.parse('http://localhost:8080/api/autos'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(autoData),
+      );
+
+      if (response.statusCode == 200) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Auto guardado exitosamente.')),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Error al guardar el auto.')),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: $e')),
+      );
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -790,45 +903,11 @@ class CrearAutoScreen extends StatefulWidget {
 
                                   // Guardar ************************************************
                                   ElevatedButton(
-                                    onPressed: () async {
-                                      if (_fotosSeleccionadas.isEmpty) {
-                                        ScaffoldMessenger.of(context).showSnackBar(
-                                          const SnackBar(content: Text('Por favor selecciona al menos una foto.')),
-                                        );
-                                        return;
-                                      }
-
-                                      // Subir las fotos al bucket y obtener los IDs
-                                      // Simula subir las fotos al bucket y obtener IDs
-                                        List<String> idsFotos = [];
-                                      //for (Uint8List foto in _fotosSeleccionadas) {
-                                        // Aquí simulas el envío de la foto al backend o bucket
-                                        // Por ejemplo, podrías convertir los bytes en un string base64 si es necesario
-                                        //String? idFoto = await subirFotoAlBucket(foto); // Función para subir la foto
-                                        //if (idFoto != null) {
-                                        //  idsFotos.add(idFoto);
-                                        //}
-                                      //}
-
-                                      // Aquí puedes llamar al backend para guardar el auto con los IDs de las fotos
-                                      //print('IDs de las fotos guardadas: $idsFotos');
-                                    },
+                                    onPressed: guardarAuto,
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: const Color(0xFF9576DA),
                                       foregroundColor: Colors.white,
                                       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                                    ),
-                                    child: const Text('Guardar'),
-                                  ),
-                                  ElevatedButton(
-                                    onPressed: () {},
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: const Color(
-                                          0xFF9576DA), // Fondo del botón
-                                      foregroundColor:
-                                          Colors.white, // Color del texto
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 20, vertical: 10),
                                     ),
                                     child: const Text('Guardar'),
                                   ),
