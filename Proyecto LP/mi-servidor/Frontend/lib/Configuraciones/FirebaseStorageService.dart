@@ -2,21 +2,28 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'dart:typed_data';
 
 class FirebaseStorageService {
-  Future<List<String>> subirFotos(List<Uint8List> fotos) async {
-    List<String> urls = [];
-    try {
-      for (int i = 0; i < fotos.length; i++) {
-        String fileName = 'auto_${DateTime.now().millisecondsSinceEpoch}_$i.png';
-        Reference storageRef = FirebaseStorage.instance.ref().child('imagenes/$fileName');
-        UploadTask uploadTask = storageRef.putData(fotos[i]);
+  final FirebaseStorage _storage = FirebaseStorage.instance;
 
-        TaskSnapshot snapshot = await uploadTask;
-        String downloadUrl = await snapshot.ref.getDownloadURL();
-        urls.add(downloadUrl);
+  Future<List<String>> subirFotos(List<Uint8List> imagenes) async {
+    List<String> urls = [];
+
+    for (Uint8List imagen in imagenes) {
+      try {
+        String filePath = "autos/${DateTime.now().millisecondsSinceEpoch}.png";
+        Reference ref = _storage.ref().child(filePath);
+
+        // ✅ Usar putData() en lugar de putFile()
+        UploadTask uploadTask = ref.putData(imagen);
+        TaskSnapshot snapshot = await uploadTask.whenComplete(() => {});
+
+        String url = await snapshot.ref.getDownloadURL();
+        urls.add(url);
+      } catch (e) {
+        print("Error al subir imagen: $e");
+        return [];
       }
-    } catch (e) {
-      print('Error al subir imágenes: $e');
     }
-    return urls; // Retorna las URLs de las imágenes subidas
+
+    return urls;
   }
 }

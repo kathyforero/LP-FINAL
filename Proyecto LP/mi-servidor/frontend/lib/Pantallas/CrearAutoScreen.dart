@@ -119,10 +119,10 @@ class CrearAutoScreen extends StatefulWidget {
         peso == null ||
         ubicacion == null ||
         estado == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Por favor completa todos los campos.')),
-      );
-      return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Por favor completa todos los campos.')),
+        );
+        return;
     }
 
     // Crear el JSON para enviar al backend
@@ -157,6 +157,7 @@ class CrearAutoScreen extends StatefulWidget {
           const SnackBar(content: Text('Auto guardado exitosamente.')),
         );
       } else {
+        print(response.statusCode);
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Error al guardar el auto.')),
         );
@@ -373,8 +374,9 @@ class CrearAutoScreen extends StatefulWidget {
                                       SizedBox(
                                         width: 550,
                                         child: TextFormField(
+                                          controller: placaController,
                                           decoration: const InputDecoration(
-                                              hintText: 'Ej.: ABC-123',
+                                              hintText: 'Ej.: ABC123',
                                               hintStyle: TextStyle(
                                                   color: Colors.white54)),
                                           style: const TextStyle(
@@ -401,6 +403,7 @@ class CrearAutoScreen extends StatefulWidget {
                                       SizedBox(
                                         width: 550,
                                         child: TextFormField(
+                                          controller: precioController,
                                           decoration: const InputDecoration(
                                               hintText: 'Ej.: 20000.00',
                                               hintStyle: TextStyle(
@@ -674,6 +677,7 @@ class CrearAutoScreen extends StatefulWidget {
                                       SizedBox(
                                         width: 550,
                                         child: TextFormField(
+                                          controller: anioController,
                                           decoration: const InputDecoration(
                                               hintText: 'Ej.: 2020',
                                               hintStyle: TextStyle(
@@ -702,6 +706,7 @@ class CrearAutoScreen extends StatefulWidget {
                                       SizedBox(
                                         width: 550,
                                         child: TextFormField(
+                                          controller: kilometrajeController,
                                           decoration: const InputDecoration(
                                               hintText: 'Ej.: 5000',
                                               hintStyle: TextStyle(
@@ -890,6 +895,7 @@ class CrearAutoScreen extends StatefulWidget {
                                       SizedBox(
                                         width: 550,
                                         child: TextFormField(
+                                          controller: pesoController,
                                           decoration: const InputDecoration(
                                               hintText: 'Peso en kg',
                                               hintStyle: TextStyle(
