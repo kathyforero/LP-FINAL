@@ -9,14 +9,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.miapp.mi_servidor.Clases.Auto;
 import com.miapp.mi_servidor.Excepciones.AutoNoEncontradoException;
 import com.miapp.mi_servidor.Servicios.AutoServicio;
-import com.miapp.mi_servidor.config.*;
 
 import java.util.HashMap;
 import java.util.List;
