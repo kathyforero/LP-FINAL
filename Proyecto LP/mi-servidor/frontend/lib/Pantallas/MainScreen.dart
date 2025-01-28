@@ -17,10 +17,10 @@ class _MainScreenState extends State<MainScreen> {
   String? _modeloSeleccionado;
   String? _tipoSeleccionado;
 
-  TextEditingController _controladorKmDesde = TextEditingController();
-  TextEditingController _controladorKmHasta = TextEditingController();
-  TextEditingController _controladorPrecioDesde = TextEditingController();
-  TextEditingController _controladorPrecioHasta = TextEditingController();
+  final TextEditingController _controladorKmDesde = TextEditingController();
+  final TextEditingController _controladorKmHasta = TextEditingController();
+  final TextEditingController _controladorPrecioDesde = TextEditingController();
+  final TextEditingController _controladorPrecioHasta = TextEditingController();
 
   bool isLoading = true; // Bandera para verificar si está cargando
   String? nombreUsuario;
@@ -388,7 +388,9 @@ class _MainScreenState extends State<MainScreen> {
                     child: const Text('Buscar'),
                   ),
                   const SizedBox(height: 10),
-                  GestureDetector(
+                  MouseRegion(
+                  cursor: SystemMouseCursors.click,
+                  child: GestureDetector(
                     onTap: () {
                       setState(() {
                         setState(() {
@@ -415,7 +417,7 @@ class _MainScreenState extends State<MainScreen> {
                             .contain, // Asegura que la imagen cubra el área
                       ),
                     ),
-                  ),
+                  )),
                 ],
               ),
             ),

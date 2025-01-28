@@ -205,6 +205,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                           if (usuario) {
                             Usuario.instancia.establecerUsuario(id: email);
+                            SnackBarHelper.showSnackBar(capturedContext,
+                                'Usuario creados exitosamente :D', Colors.green);
                             Navigator.push(
                               capturedContext,
                               MaterialPageRoute(
