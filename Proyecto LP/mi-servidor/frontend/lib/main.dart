@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'Pantallas/LoginScreen.dart';
-import 'package:firebase_core/firebase_core.dart';
 
-void main() async{
-  WidgetsFlutterBinding.ensureInitialized(); 
-  await Firebase.initializeApp(); // Asegura la inicialización de Widgets
+void main() {
   runApp(MyApp());
 }
 
