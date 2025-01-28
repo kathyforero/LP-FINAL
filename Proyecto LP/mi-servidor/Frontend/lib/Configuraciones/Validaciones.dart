@@ -16,7 +16,7 @@ class Validaciones {
   }
 
   static bool valAlfabetico(String value) {
-    final RegExp regex = RegExp(r'^[a-zA-Z]+$');
+    final RegExp regex = RegExp(r'^[a-zA-ZáéíóúÁÉÍÓÚñÑ]+( [a-zA-ZáéíóúÁÉÍÓÚñÑ]+)*$');
     return regex.hasMatch(value);
   }
 }

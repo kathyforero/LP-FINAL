@@ -8,6 +8,32 @@ class ApiServicio {
   static String urlBase='http://localhost:8080/api/';
   
 
+    static Future<bool> crearUsuario(String nombre, String apellido, String correo, String contrasena) async {
+      final url = Uri.parse('${urlBase}usuarios'); // Endpoint para crear usuarios
+
+      try {
+        // Realizar el POST
+        final response = await http.post(
+          url,
+          headers: {'Content-Type': 'application/json'},
+          body: json.encode({"nombre": nombre, "apellido": apellido, "correo": correo, "contrasena": contrasena, "favoritos": []}),
+        );
+
+        // Verificar respuesta
+        if (response.statusCode == 201) {
+          // Usuario creado exitosamente
+          return true;
+        } else {
+          // Error al crear usuario
+          print('Error al crear usuario: ${response.body}');
+          return false;
+        }
+      } catch (e) {
+        print('Error al conectarse con el servidor: $e');
+        return false;
+      }
+    }
+    
     static Future<bool> autenticarUsuario(String correo, String contrasena) async {
 
       final url = Uri.parse(urlBase+'usuarios/autenticar'); // Reemplaza con la URL de tu backend

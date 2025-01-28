@@ -199,11 +199,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                         try {
                           final capturedContext = context;
-                          final autenticado =
-                              await ApiServicio.autenticarUsuario(
-                                  email, password);
+                          final usuario =
+                              await ApiServicio.crearUsuario(
+                                  nombre, apellido, email, password);
 
-                          if (autenticado) {
+                          if (usuario) {
                             Usuario.instancia.establecerUsuario(id: email);
                             Navigator.push(
                               capturedContext,
@@ -212,7 +212,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             );
                           } else {
                             SnackBarHelper.showSnackBar(capturedContext,
-                                'Credenciales Incorrectas', Colors.red);
+                                'Error al crear usuario. :(', Colors.red);
                           }
                         } catch (e) {
                           print(e);
