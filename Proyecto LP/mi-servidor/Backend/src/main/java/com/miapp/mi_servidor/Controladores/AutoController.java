@@ -9,17 +9,21 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.miapp.mi_servidor.Clases.Auto;
 import com.miapp.mi_servidor.Excepciones.AutoNoEncontradoException;
 import com.miapp.mi_servidor.Servicios.AutoServicio;
+import com.miapp.mi_servidor.config.*;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import jakarta.validation.Valid;
+
 import org.springframework.http.HttpStatus;
 
 @RestController
@@ -27,6 +31,7 @@ import org.springframework.http.HttpStatus;
 public class AutoController {
 
     private final AutoServicio autoServicio;
+    
 
     public AutoController(AutoServicio autoServicio) {
         this.autoServicio = autoServicio;
@@ -44,38 +49,55 @@ public class AutoController {
 
     @PostMapping
     public ResponseEntity<Map<String, Object>> guardarAuto(@Valid @RequestBody Auto auto, BindingResult bindingResult) throws Exception {
-        
-        if(autoServicio.obtenerAutoValidar(auto.getPlaca())==true){
+        System.out.println(auto);
+        // Validar si el auto ya existe
+        if (autoServicio.obtenerAutoValidar(auto.getPlaca())) {
             return ResponseEntity.badRequest().body(Map.of(
                 "status", "error",
-                "message", "Errores en los datos enviados",
-                "errors", "El auto ya existe!!"
+                "message", "El auto ya existe!"
             ));
         }
-        
+
+        // Validar errores en los campos enviados
         if (bindingResult.hasErrors()) {
-            // Construir el mapa de errores
-            Map<String, Object> errores = new HashMap<>();
-            bindingResult.getFieldErrors().forEach(error -> 
-                errores.put(error.getField(), error.getDefaultMessage())
-            );
-
-            // Retornar una respuesta con los errores y un estado 400 (Bad Request)
+            bindingResult.getFieldErrors().forEach(error -> {
+                System.out.println("Error en el campo: " + error.getField() + " - " + error.getDefaultMessage());
+            });
             return ResponseEntity.badRequest().body(Map.of(
                 "status", "error",
                 "message", "Errores en los datos enviados",
-                "errors", errores
+                "errors", bindingResult.getFieldErrors()
+            ));
+        }
+        
+
+        // Validar que las URLs de fotos sean válidas
+        if (auto.getFotos() == null || auto.getFotos().isEmpty()) {
+            return ResponseEntity.badRequest().body(Map.of(
+                "status", "error",
+                "message", "Se requieren al menos una URL en 'fotos'."
             ));
         }
 
-        // Si no hay errores, continuar con la lógica normal
-        String mensajeExitoso = autoServicio.guardarAuto(auto);
-        Map<String, Object> response = new HashMap<>();
-        response.put("mensaje", mensajeExitoso);
-        response.put("auto", auto);
+        for (String url : auto.getFotos()) {
+            if (!url.startsWith("https://firebasestorage.googleapis.com/")) {
+                return ResponseEntity.badRequest().body(Map.of(
+                    "status", "error",
+                    "message", "Una o más URLs de las fotos no son válidas."
+                ));
+            }
+        }
 
-        return ResponseEntity.ok(response);
+        // Guardar el auto en la base de datos
+        String mensajeExitoso = autoServicio.guardarAuto(auto);
+        return ResponseEntity.ok(Map.of(
+            "status", "success",
+            "message", mensajeExitoso,
+            "auto", auto
+        ));
     }
+
+
 
     @PutMapping
     public ResponseEntity<Map<String, Object>> actualizarAuto(@Valid @RequestBody Auto auto, BindingResult bindingResult) throws Exception {
