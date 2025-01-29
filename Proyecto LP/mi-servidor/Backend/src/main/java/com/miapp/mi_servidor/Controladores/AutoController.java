@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.miapp.mi_servidor.Clases.Auto;
@@ -176,5 +177,16 @@ public class AutoController {
             ));
         }
     }
+
+    @GetMapping("/filtrar")
+        public List<Auto> filtrarAutos(@RequestParam(required = false) String marca,
+                                    @RequestParam(required = false) Integer kilometrajeMin,
+                                    @RequestParam(required = false) Integer kilometrajeMax,
+                                    @RequestParam(required = false) Double precioMin,
+                                    @RequestParam(required = false) Double precioMax,
+                                    @RequestParam(required = false) String tipo) throws Exception {
+            return autoServicio.obtenerAutosFiltrados(marca, kilometrajeMin, kilometrajeMax, precioMin, precioMax, tipo);
+        }
+
 }
 

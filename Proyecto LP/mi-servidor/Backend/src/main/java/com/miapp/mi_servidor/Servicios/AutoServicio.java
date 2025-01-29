@@ -1,5 +1,6 @@
 package com.miapp.mi_servidor.Servicios;
 
+import com.google.cloud.firestore.CollectionReference;
 import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.QuerySnapshot;
@@ -7,6 +8,7 @@ import com.google.firebase.cloud.FirestoreClient;
 import com.miapp.mi_servidor.Clases.Auto;
 import org.springframework.stereotype.Service;
 import com.miapp.mi_servidor.Excepciones.AutoNoEncontradoException;
+import com.google.cloud.firestore.Query;
 
 
 import java.util.List;
@@ -143,5 +145,38 @@ public class AutoServicio{
 
         return autos;
     }
+
+    public List<Auto> obtenerAutosFiltrados(String marca, Integer kilometrajeMin, Integer kilometrajeMax, 
+                                        Double precioMin, Double precioMax, String tipo) throws Exception {
+    Firestore db = FirestoreClient.getFirestore();
+
+    CollectionReference autosRef = db.collection("autos");
+    Query query = autosRef;
+
+    // Aplicar filtros dinámicamente
+    if (marca != null && !marca.isEmpty()) {
+        query = query.whereEqualTo("marca", marca);
+    }
+    if (kilometrajeMin != null) {
+        query = query.whereGreaterThanOrEqualTo("kilometraje", kilometrajeMin);
+    }
+    if (kilometrajeMax != null) {
+        query = query.whereLessThanOrEqualTo("kilometraje", kilometrajeMax);
+    }
+    if (precioMin != null) {
+        query = query.whereGreaterThanOrEqualTo("precio", precioMin);
+    }
+    if (precioMax != null) {
+        query = query.whereLessThanOrEqualTo("precio", precioMax);
+    }
+    if (tipo != null && !tipo.isEmpty()) {
+        query = query.whereEqualTo("tipo", tipo);
+    }
+
+    // Ejecutar la consulta
+    QuerySnapshot querySnapshot = query.get().get();
+    return querySnapshot.toObjects(Auto.class);
+}
+
 
 }
