@@ -2,6 +2,7 @@ package com.miapp.mi_servidor.Servicios;
 
 import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
+import com.google.cloud.firestore.QuerySnapshot;
 import com.google.firebase.cloud.FirestoreClient;
 import com.miapp.mi_servidor.Clases.Auto;
 import org.springframework.stereotype.Service;
@@ -122,4 +123,25 @@ public class AutoServicio{
         db.collection("autos").document(auto.getPlaca()).set(auto);
         return "Auto actualizado exitosamente";
     }
+
+    public List<Auto> obtenerAutosPorUsuario(String correoUsuario) throws Exception {
+        Firestore db = FirestoreClient.getFirestore();
+
+        // Consulta donde 'usuario' sea igual al correo del usuario
+        QuerySnapshot querySnapshot = db.collection("autos")
+                                        .whereEqualTo("usuario", correoUsuario)
+                                        .get()
+                                        .get();
+
+        List<Auto> autos = querySnapshot.toObjects(Auto.class);
+
+        // Conversión manual de enums si es necesario
+        for (Auto auto : autos) {
+            DocumentSnapshot doc = db.collection("autos").document(auto.getPlaca()).get().get();
+            convertirEnum(auto, doc);
+        }
+
+        return autos;
+    }
+
 }

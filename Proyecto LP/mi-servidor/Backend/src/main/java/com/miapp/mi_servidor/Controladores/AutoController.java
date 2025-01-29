@@ -44,6 +44,11 @@ public class AutoController {
         return autoServicio.obtenerAuto(placa);
     }
 
+    @GetMapping("/usuario/{user}")
+    public List<Auto> AutosPorUsuario(@PathVariable String user) throws Exception {
+        return autoServicio.obtenerAutosPorUsuario(user);
+    }
+
     @PostMapping
     public ResponseEntity<Map<String, Object>> guardarAuto(@Valid @RequestBody Auto auto, BindingResult bindingResult) throws Exception {
         System.out.println(auto);
