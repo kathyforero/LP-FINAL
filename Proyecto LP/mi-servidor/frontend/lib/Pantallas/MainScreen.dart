@@ -208,6 +208,7 @@ class _MainScreenState extends State<MainScreen> {
                           onChanged: (value) {
                             setState(() {
                               _marcaSeleccionada = value;
+                              _modeloSeleccionado =null;
                               cargarModelos(value!);
                             });
                           },
