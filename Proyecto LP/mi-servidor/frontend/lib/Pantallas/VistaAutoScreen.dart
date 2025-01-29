@@ -10,7 +10,10 @@ import '../Configuraciones/FirebaseStorageService.dart';
 
 // Crear Autos
 class VistaAutoScreen extends StatefulWidget {
-  const VistaAutoScreen({super.key});
+  
+  final Map<String, dynamic> auto;
+
+  const VistaAutoScreen({Key? key, required this.auto}) : super(key: key);
 
   @override
   State<VistaAutoScreen> createState() => _VistaAutoScreenState();
@@ -18,25 +21,16 @@ class VistaAutoScreen extends StatefulWidget {
 
 class _VistaAutoScreenState extends State<VistaAutoScreen> {
  
-  final List<Uint8List> _fotosSeleccionadas = [];
+  late Map<String, dynamic> auto;
+  late List<String> _fotosSeleccionadas;
+
   int indiceActual = 0;
 
   @override
   void initState() {
     super.initState();
-  }
-
-  Future<void> seleccionarFotos() async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles();
-
-    if (result != null && result.files.single.bytes != null) {
-      setState(() {
-        _fotosSeleccionadas.add(result.files.single.bytes!);
-        if (_fotosSeleccionadas.length == 1) {
-          indiceActual = 0;
-        }
-      });
-    }
+    auto = widget.auto;
+    _fotosSeleccionadas = List<String>.from(widget.auto['fotos'] ?? []);
   }
 
   void imagenAnterior() {
@@ -107,7 +101,16 @@ class _VistaAutoScreenState extends State<VistaAutoScreen> {
                                 .center, // Centra horizontalmente
                             children: [
                               // Subido por
-
+                              Text(
+                              'Subido por: ${auto['usuario']}',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: Color.fromARGB(255, 255, 211, 208),
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                decoration: TextDecoration.underline,
+                              ),
+                            ),
                               SizedBox(height: 10),
 
                               //Presentación de imagenes
@@ -115,11 +118,10 @@ class _VistaAutoScreenState extends State<VistaAutoScreen> {
                                 width: 650,
                                 height: 576,
                                 child: _fotosSeleccionadas.isNotEmpty
-                                    ? Image.memory(
-                                        _fotosSeleccionadas[
-                                            indiceActual], // Muestra la imagen actual desde los bytes
-                                        fit: BoxFit.contain,
-                                      )
+                                    ? Image.network(
+                                      _fotosSeleccionadas[indiceActual],
+                                      fit: BoxFit.contain,
+                                    )
                                     : const Image(
                                         image: NetworkImage(
                                             'https://i.postimg.cc/qRYLrN7X/preview.png'), // Placeholder
@@ -223,8 +225,8 @@ class _VistaAutoScreenState extends State<VistaAutoScreen> {
                                         ),
                                         const SizedBox(width: 40),
                                         // INFO PLACA
-                                        const Text(
-                                          'Placa:',
+                                        Text(
+                                          '${auto['placa']}',
                                           style: TextStyle(
                                               fontSize: 18,
                                               fontWeight: FontWeight.bold,
@@ -248,8 +250,8 @@ class _VistaAutoScreenState extends State<VistaAutoScreen> {
                                         ),
                                         const SizedBox(width: 40),
                                         // INFO PRECIO
-                                        const Text(
-                                          'Placa:',
+                                        Text(
+                                          '${auto['precio']}',
                                           style: TextStyle(
                                               fontSize: 18,
                                               fontWeight: FontWeight.bold,
@@ -273,8 +275,8 @@ class _VistaAutoScreenState extends State<VistaAutoScreen> {
                                           ),
                                           const SizedBox(width: 40),
                                           // INFO MARCA
-                                          const Text(
-                                              'Placa:',
+                                          Text(
+                                              '${auto['marca']}',
                                               style: TextStyle(
                                                   fontSize: 18,
                                                   fontWeight: FontWeight.bold,
@@ -297,8 +299,8 @@ class _VistaAutoScreenState extends State<VistaAutoScreen> {
                                             ),
                                             const SizedBox(width: 40),
                                             // INFO MODELO
-                                            const Text(
-                                              'Placa:',
+                                            Text(
+                                              '${auto['modelo']}',
                                               style: TextStyle(
                                                   fontSize: 18,
                                                   fontWeight: FontWeight.bold,
@@ -321,8 +323,8 @@ class _VistaAutoScreenState extends State<VistaAutoScreen> {
                                           ),
                                           const SizedBox(width: 40),
                                           // INFO TIPO
-                                          const Text(
-                                              'Placa:',
+                                          Text(
+                                              '${auto['tipo']}',
                                               style: TextStyle(
                                                   fontSize: 18,
                                                   fontWeight: FontWeight.bold,
@@ -345,8 +347,8 @@ class _VistaAutoScreenState extends State<VistaAutoScreen> {
                                         ),
                                         const SizedBox(width: 40),
                                         // INFO AÑO
-                                        const Text(
-                                          'Placa:',
+                                        Text(
+                                          '${auto['anio']}',
                                           style: TextStyle(
                                               fontSize: 18,
                                               fontWeight: FontWeight.bold,
@@ -370,8 +372,8 @@ class _VistaAutoScreenState extends State<VistaAutoScreen> {
                                         ),
                                         const SizedBox(width: 40),
                                         // INFO KILOMETRAJE
-                                        const Text(
-                                          'Placa:',
+                                         Text(
+                                          '${auto['kilometraje']}',
                                           style: TextStyle(
                                               fontSize: 18,
                                               fontWeight: FontWeight.bold,
@@ -395,8 +397,8 @@ class _VistaAutoScreenState extends State<VistaAutoScreen> {
                                           ),
                                           const SizedBox(width: 40),
                                           // INFO MOTOR
-                                          const Text(
-                                            'Placa:',
+                                          Text(
+                                            '${auto['motor']}',
                                             style: TextStyle(
                                                 fontSize: 18,
                                                 fontWeight: FontWeight.bold,
@@ -419,8 +421,8 @@ class _VistaAutoScreenState extends State<VistaAutoScreen> {
                                           ),
                                           const SizedBox(width: 40),
                                           // INFO TRANSMISIÓN
-                                          const Text(
-                                            'Placa:',
+                                          Text(
+                                            '${auto['transmision']}',
                                             style: TextStyle(
                                                 fontSize: 18,
                                                 fontWeight: FontWeight.bold,
@@ -443,8 +445,8 @@ class _VistaAutoScreenState extends State<VistaAutoScreen> {
                                         ),
                                         const SizedBox(width: 40),
                                         // INFO PESO
-                                        const Text(
-                                          'Placa:',
+                                        Text(
+                                          '${auto['peso']}',
                                           style: TextStyle(
                                               fontSize: 18,
                                               fontWeight: FontWeight.bold,
@@ -468,8 +470,8 @@ class _VistaAutoScreenState extends State<VistaAutoScreen> {
                                           ),
                                           const SizedBox(width: 40),
                                           // INFO UBICACIÓN
-                                          const Text(
-                                            'Placa:',
+                                          Text(
+                                            '${auto['ubicacion']}',
                                             style: TextStyle(
                                                 fontSize: 18,
                                                 fontWeight: FontWeight.bold,
@@ -492,8 +494,8 @@ class _VistaAutoScreenState extends State<VistaAutoScreen> {
                                           ),
                                           const SizedBox(width: 40),
                                           // INFO ESTADOS
-                                          const Text(
-                                            'Placa:',
+                                          Text(
+                                            '${auto['estado']}',
                                             style: TextStyle(
                                                 fontSize: 18,
                                                 fontWeight: FontWeight.bold,

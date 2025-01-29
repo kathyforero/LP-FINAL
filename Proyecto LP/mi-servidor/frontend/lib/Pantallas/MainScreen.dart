@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import '../Configuraciones/Usuario.dart';
 import 'CrearAutoScreen.dart';
+import 'VistaAutoScreen.dart';
 import '../Widgets/MyPopUpMenu.dart';
 import '../Configuraciones/ApiServicio.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 // Pantalla principal (nueva)
 class MainScreen extends StatefulWidget {
@@ -28,7 +30,7 @@ class _MainScreenState extends State<MainScreen> {
   List<String>? marcas;
   Map<String, List<String>> modelosPorMarca = {};
   List<String>? tipos;
-  
+
   bool isCargandoMarcas = true;
   bool isCargandoModelos = false;
   bool isCargandoTipos = true;
@@ -55,32 +57,33 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   Future<void> cargarMarcas() async {
-  try {
-    final listaMarcas = await ApiServicio.obtenerMarcas();
-    setState(() {
-      marcas = listaMarcas;
-      isCargandoMarcas = false;
-    });
-  } catch (e) {
-    print('Error al cargar marcas: $e');
-    setState(() => isCargandoMarcas = false);
+    try {
+      final listaMarcas = await ApiServicio.obtenerMarcas();
+      setState(() {
+        marcas = listaMarcas;
+        isCargandoMarcas = false;
+      });
+    } catch (e) {
+      print('Error al cargar marcas: $e');
+      setState(() => isCargandoMarcas = false);
+    }
   }
-}
 
   Future<void> cargarModelos(String marca) async {
-  if (modelosPorMarca.containsKey(marca)) return; // Si ya existen, no volver a cargar
-  setState(() => isCargandoModelos = true);
-  try {
-    final listaModelos = await ApiServicio.obtenerModelos(marca);
-    setState(() {
-      modelosPorMarca[marca] = listaModelos;
-      isCargandoModelos = false;
-    });
-  } catch (e) {
-    print('Error al cargar modelos para $marca: $e');
-    setState(() => isCargandoModelos = false);
+    if (modelosPorMarca.containsKey(marca))
+      return; // Si ya existen, no volver a cargar
+    setState(() => isCargandoModelos = true);
+    try {
+      final listaModelos = await ApiServicio.obtenerModelos(marca);
+      setState(() {
+        modelosPorMarca[marca] = listaModelos;
+        isCargandoModelos = false;
+      });
+    } catch (e) {
+      print('Error al cargar modelos para $marca: $e');
+      setState(() => isCargandoModelos = false);
+    }
   }
-}
 
   Future<void> cargarTipos() async {
     setState(() => isCargandoTipos = true);
@@ -186,77 +189,92 @@ class _MainScreenState extends State<MainScreen> {
                         color: Colors.white),
                   ),
                   const SizedBox(height: 10),
-                  
                   isCargandoMarcas
-                ? const CircularProgressIndicator()
-                : DropdownButtonFormField<String>(
-                      value: _marcaSeleccionada,
-                      items: marcas?.map((marca) {
-                        return DropdownMenuItem(
-                          value: marca,
-                          child: Text(
-                            marca,
-                            style: TextStyle(color: Colors.white), // Pone el texto en blanco
+                      ? const CircularProgressIndicator()
+                      : DropdownButtonFormField<String>(
+                          value: _marcaSeleccionada,
+                          items: marcas?.map((marca) {
+                            return DropdownMenuItem(
+                              value: marca,
+                              child: Text(
+                                marca,
+                                style: TextStyle(
+                                    color: Colors
+                                        .white), // Pone el texto en blanco
+                              ),
+                            );
+                          }).toList(),
+                          onChanged: (value) {
+                            setState(() {
+                              _marcaSeleccionada = value;
+                              cargarModelos(value!);
+                            });
+                          },
+                          decoration: const InputDecoration(
+                            labelText: "Marca",
+                            labelStyle: TextStyle(
+                                color: Colors.white), // Color de la etiqueta
+                            enabledBorder: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                  color: Colors.white), // Borde blanco
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                  color: Colors.purple), // Borde al seleccionar
+                            ),
                           ),
-                        );
-                      }).toList(),
-                      onChanged: (value) {
-                        setState(() {
-                          _marcaSeleccionada = value;
-                          cargarModelos(value!);
-                        });
-                      },
-                      decoration: const InputDecoration(
-                        labelText: "Marca",
-                        labelStyle: TextStyle(color: Colors.white), // Color de la etiqueta
-                        enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.white), // Borde blanco
+                          style: TextStyle(
+                              color:
+                                  Colors.white), // Color del texto seleccionado
+                          dropdownColor:
+                              const Color(0xFF2B193E), // Fondo del desplegable
                         ),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.purple), // Borde al seleccionar
-                        ),
-                      ),
-                      style: TextStyle(color: Colors.white), // Color del texto seleccionado
-                      dropdownColor: const Color(0xFF2B193E), // Fondo del desplegable
-                    ),
-
                   const SizedBox(height: 10),
-
-                  if (_marcaSeleccionada != null)                    
-                  isCargandoModelos
-                  ? const CircularProgressIndicator()
-                  : DropdownButtonFormField<String>(
-                        value: _modeloSeleccionado,
-                        items: (_marcaSeleccionada != null && modelosPorMarca.containsKey(_marcaSeleccionada))
-                            ? modelosPorMarca[_marcaSeleccionada]!.map((modelo) {
-                                return DropdownMenuItem(
-                                  value: modelo,
-                                  child: Text(
-                                    modelo,
-                                    style: TextStyle(color: Colors.white), // Texto blanco
-                                  ),
-                                );
-                              }).toList()
-                            : [],
-                        onChanged: (value) {
-                          setState(() {
-                            _modeloSeleccionado = value;
-                          });
-                        },
-                        decoration: const InputDecoration(
-                          labelText: "Modelo",
-                          labelStyle: TextStyle(color: Colors.white), // Etiqueta blanca
-                          enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: Colors.white), // Borde blanco
+                  if (_marcaSeleccionada != null)
+                    isCargandoModelos
+                        ? const CircularProgressIndicator()
+                        : DropdownButtonFormField<String>(
+                            value: _modeloSeleccionado,
+                            items: (_marcaSeleccionada != null &&
+                                    modelosPorMarca
+                                        .containsKey(_marcaSeleccionada))
+                                ? modelosPorMarca[_marcaSeleccionada]!
+                                    .map((modelo) {
+                                    return DropdownMenuItem(
+                                      value: modelo,
+                                      child: Text(
+                                        modelo,
+                                        style: TextStyle(
+                                            color:
+                                                Colors.white), // Texto blanco
+                                      ),
+                                    );
+                                  }).toList()
+                                : [],
+                            onChanged: (value) {
+                              setState(() {
+                                _modeloSeleccionado = value;
+                              });
+                            },
+                            decoration: const InputDecoration(
+                              labelText: "Modelo",
+                              labelStyle: TextStyle(
+                                  color: Colors.white), // Etiqueta blanca
+                              enabledBorder: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                    color: Colors.white), // Borde blanco
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                    color:
+                                        Colors.purple), // Borde al seleccionar
+                              ),
+                            ),
+                            style: TextStyle(
+                                color: Colors.white), // Texto en blanco
+                            dropdownColor: const Color(
+                                0xFF2B193E), // Fondo del desplegable
                           ),
-                          focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: Colors.purple), // Borde al seleccionar
-                          ),
-                        ),
-                        style: TextStyle(color: Colors.white), // Texto en blanco
-                        dropdownColor: const Color(0xFF2B193E), // Fondo del desplegable
-                      ),                    
-
                   const SizedBox(height: 10),
                   Row(
                     children: [
@@ -310,39 +328,43 @@ class _MainScreenState extends State<MainScreen> {
                     ],
                   ),
                   const SizedBox(height: 10),
-                  
                   isCargandoTipos
-                  ? const CircularProgressIndicator()
-                  : DropdownButtonFormField<String>(
-                        value: _tipoSeleccionado,
-                        items: tipos?.map((tipo) {
-                          return DropdownMenuItem(
-                            value: tipo,
-                            child: Text(
-                              tipo,
-                              style: TextStyle(color: Colors.white), // Texto blanco
+                      ? const CircularProgressIndicator()
+                      : DropdownButtonFormField<String>(
+                          value: _tipoSeleccionado,
+                          items: tipos?.map((tipo) {
+                            return DropdownMenuItem(
+                              value: tipo,
+                              child: Text(
+                                tipo,
+                                style: TextStyle(
+                                    color: Colors.white), // Texto blanco
+                              ),
+                            );
+                          }).toList(),
+                          onChanged: (value) {
+                            setState(() {
+                              _tipoSeleccionado = value;
+                            });
+                          },
+                          decoration: const InputDecoration(
+                            labelText: "Tipo",
+                            labelStyle: TextStyle(
+                                color: Colors.white), // Etiqueta blanca
+                            enabledBorder: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                  color: Colors.white), // Borde blanco
                             ),
-                          );
-                        }).toList(),
-                        onChanged: (value) {
-                          setState(() {
-                            _tipoSeleccionado = value;
-                          });
-                        },
-                        decoration: const InputDecoration(
-                          labelText: "Tipo",
-                          labelStyle: TextStyle(color: Colors.white), // Etiqueta blanca
-                          enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: Colors.white), // Borde blanco
+                            focusedBorder: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                  color: Colors.purple), // Borde al seleccionar
+                            ),
                           ),
-                          focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: Colors.purple), // Borde al seleccionar
-                          ),
+                          style:
+                              TextStyle(color: Colors.white), // Texto en blanco
+                          dropdownColor:
+                              const Color(0xFF2B193E), // Fondo del desplegable
                         ),
-                        style: TextStyle(color: Colors.white), // Texto en blanco
-                        dropdownColor: const Color(0xFF2B193E), // Fondo del desplegable
-                      ),
-
                   const SizedBox(height: 20),
                   ElevatedButton(
                     onPressed: () {},
@@ -357,35 +379,35 @@ class _MainScreenState extends State<MainScreen> {
                   ),
                   const SizedBox(height: 10),
                   MouseRegion(
-                  cursor: SystemMouseCursors.click,
-                  child: GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        setState(() {
-                          _marcaSeleccionada =
-                              null; // Restablecer marca seleccionada
-                          _modeloSeleccionado = null;
-                          _tipoSeleccionado =
-                              null; // Restablecer modelo seleccionado
-                          _controladorKmDesde.clear();
-                          _controladorKmHasta.clear();
-                          _controladorPrecioDesde.clear();
-                          _controladorPrecioHasta
-                              .clear(); // Limpiar el TextFormField
-                        });
-                      });
-                    },
-                    child: const SizedBox(
-                      width: 45, // Ancho de la imagen
-                      height: 47, // Alto de la imagen
-                      child: Image(
-                        image: NetworkImage(
-                            'https://i.postimg.cc/TPjtkxv9/borrarfiltro.png'),
-                        fit: BoxFit
-                            .contain, // Asegura que la imagen cubra el área
-                      ),
-                    ),
-                  )),
+                      cursor: SystemMouseCursors.click,
+                      child: GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            setState(() {
+                              _marcaSeleccionada =
+                                  null; // Restablecer marca seleccionada
+                              _modeloSeleccionado = null;
+                              _tipoSeleccionado =
+                                  null; // Restablecer modelo seleccionado
+                              _controladorKmDesde.clear();
+                              _controladorKmHasta.clear();
+                              _controladorPrecioDesde.clear();
+                              _controladorPrecioHasta
+                                  .clear(); // Limpiar el TextFormField
+                            });
+                          });
+                        },
+                        child: const SizedBox(
+                          width: 45, // Ancho de la imagen
+                          height: 47, // Alto de la imagen
+                          child: Image(
+                            image: NetworkImage(
+                                'https://i.postimg.cc/TPjtkxv9/borrarfiltro.png'),
+                            fit: BoxFit
+                                .contain, // Asegura que la imagen cubra el área
+                          ),
+                        ),
+                      )),
                 ],
               ),
             ),
@@ -450,102 +472,129 @@ class _MainScreenState extends State<MainScreen> {
                 ),
 
                 // Vehicle grid
-                Expanded(
-                  child: LayoutBuilder(
-                    builder: (context, constraints) {
-                      // Ancho deseado por ítem
-                      const double itemWidth = 200;
-                      const double itemHeight = 265;
-                      // Calcular número de columnas basado en el ancho disponible
-                      int crossAxisCount =
-                          (constraints.maxWidth / itemWidth).floor();
+                FutureBuilder<List<Map<String, dynamic>>?>(
+                  future: ApiServicio.obtenerTodosLosAutos(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator());
+                    } else if (snapshot.hasError || snapshot.data == null) {
+                      return const Center(
+                          child: Text("Error al cargar los autos"));
+                    }
 
-                      return GridView.builder(
-                        padding: const EdgeInsets.all(16.0),
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: crossAxisCount,
-                          crossAxisSpacing: 16,
-                          mainAxisSpacing: 16,
-                          childAspectRatio: itemWidth /
-                              itemHeight, // Proporción del ancho y alto del ítem
-                        ),
-                        itemCount: 10,
-                        itemBuilder: (context, index) {
-                          return SizedBox(
-                              height: itemHeight,
-                              child: Card(
-                                color: const Color(
-                                    0xFF2B193E), // Fondo del card igual al fondo general
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                elevation: 4,
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    ClipRRect(
-                                      borderRadius: const BorderRadius.vertical(
-                                          top: Radius.circular(12)),
-                                      child: SizedBox(
-                                        height: 120, // Altura máxima
-                                        width: double
-                                            .infinity, // Ancho completo del card
-                                        child: Image(
-                                            image: NetworkImage(
-                                                'https://i.postimg.cc/MpJ6R06Q/Fondo-Gris.png'),
-                                            fit: BoxFit.contain,
-                                            alignment: Alignment.center),
-                                      ),
+                    final autos = snapshot.data!;
+
+                    return Expanded(
+                      child: LayoutBuilder(
+                        builder: (context, constraints) {
+                          const double itemWidth = 200;
+                          const double itemHeight = 300;
+                          int crossAxisCount =
+                              (constraints.maxWidth / itemWidth).floor();
+
+                          return GridView.builder(
+                            padding: const EdgeInsets.all(16.0),
+                            gridDelegate:
+                                SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: crossAxisCount,
+                              crossAxisSpacing: 16,
+                              mainAxisSpacing: 16,
+                              childAspectRatio: itemWidth / itemHeight,
+                            ),
+                            itemCount: autos.length,
+                            itemBuilder: (context, index) {
+                              final auto = autos[index];
+
+                              return GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          VistaAutoScreen(auto: auto),
                                     ),
-                                    Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: const [
-                                          Text(
-                                            'Marca y Modelo',
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 16,
-                                              color:
-                                                  Colors.white, // Texto blanco
-                                            ),
-                                          ),
-                                          SizedBox(height: 4),
-                                          Text(
-                                            'Año - Kilometraje',
-                                            style: TextStyle(
-                                                color: Colors
-                                                    .white), // Texto blanco
-                                          ),
-                                          SizedBox(height: 4),
-                                          Text(
-                                            'Ubicación',
-                                            style: TextStyle(
-                                                color: Colors
-                                                    .white), // Texto blanco
-                                          ),
-                                          SizedBox(height: 4),
-                                          Text(
-                                            'Precio',
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 16,
-                                              color:
-                                                  Colors.white, // Texto blanco
-                                            ),
-                                          ),
-                                        ],
-                                      ),
+                                  );
+                                },
+                                child: SizedBox(
+                                  height: itemHeight,
+                                  child: Card(
+                                    color: const Color(0xFF2B193E),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
                                     ),
-                                  ],
+                                    elevation: 4,
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        ClipRRect(
+                                            borderRadius:
+                                                const BorderRadius.vertical(
+                                                    top: Radius.circular(12)),
+                                            child: SizedBox(
+                                                height: 120,
+                                                width: double.infinity,
+                                                child: CachedNetworkImage(
+                                                  imageUrl:
+                                                      '${auto['fotos'][0]}',
+                                                  placeholder: (context, url) =>
+                                                      CircularProgressIndicator(),
+                                                  errorWidget:
+                                                      (context, url, error) =>
+                                                          Icon(Icons.error),
+                                                ))),
+                                        Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                '${auto['marca'][0]}' +
+                                                '${auto['marca'][0]} '.toLowerCase() +
+                                                '${auto['modelo']}',
+                                                style: const TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 16,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                              const SizedBox(height: 4),
+                                              Text(
+                                                '${auto['anio']} - ${auto['kilometraje']} km',
+                                                style: const TextStyle(
+                                                    color: Colors.white),
+                                              ),
+                                              const SizedBox(height: 4),
+                                              Text(
+                                                auto['ubicacion'] ??
+                                                    'Ubicación desconocida',
+                                                style: const TextStyle(
+                                                    color: Colors.white),
+                                              ),
+                                              const SizedBox(height: 4),
+                                              Text(
+                                                '\$${auto['precio']}',
+                                                style: const TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 16,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
                                 ),
-                              ));
+                              );
+                            },
+                          );
                         },
-                      );
-                    },
-                  ),
+                      ),
+                    );
+                  },
                 ),
               ],
             ),

@@ -993,6 +993,19 @@ class _EditarAutoScreenState extends State<EditarAutoScreen> {
                                       ),
                                       child: const Text('Guardar'),
                                     ),
+
+                                    // ELIMINAR AUTO ************************************************
+                                    ElevatedButton(
+                                      onPressed: guardarAuto,
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor:
+                                            const Color(0xFF9576DA),
+                                        foregroundColor: Colors.white,
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 20, vertical: 10),
+                                      ),
+                                      child: const Text('ELIMINAR AUTO'),
+                                    ),
                                   ],
                                 ),
                               ),
