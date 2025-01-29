@@ -19,4 +19,11 @@ enum Transmision {
       orElse: () => throw Exception("Valor inválido para el enum Transmision: $displayName"),
     ).backendValue;
   }
+  
+  static String? getDisplayName(String? backendValue) {
+    return Transmision.values.firstWhere(
+      (transmision) => transmision.backendValue == backendValue,
+      orElse: () => throw Exception("Transmisión no válida: $backendValue"),
+    ).displayName;
+  }
 }

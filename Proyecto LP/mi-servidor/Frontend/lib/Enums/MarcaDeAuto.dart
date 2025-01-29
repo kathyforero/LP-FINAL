@@ -34,5 +34,12 @@ enum MarcaDeAutoEnum {
   static String? getBackendValue(String? displayName) {
     return fromDisplayName(displayName)?.name.toUpperCase();
   }
+
+  static String? getDisplayName(String? backendValue) {
+  return MarcaDeAutoEnum.values.firstWhere(
+    (marca) => marca.name.toUpperCase() == backendValue,
+    orElse: () => throw Exception("Marca no válida: $backendValue"),
+  ).displayName;
+}
 }
 

@@ -3,6 +3,13 @@ import 'dart:typed_data';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
+import '../Enums/Ubicacion.dart';
+import '../Enums/MarcaDeAuto.dart';
+import '../Enums/Estado.dart';
+import '../Enums/Tipo.dart';
+import '../Enums/Transmision.dart';
+import '../Enums/Motor.dart';
+
 
 import '../Configuraciones/Usuario.dart';
 import '../Configuraciones/ApiServicio.dart';
@@ -276,7 +283,9 @@ class _VistaAutoScreenState extends State<VistaAutoScreen> {
                                           const SizedBox(width: 40),
                                           // INFO MARCA
                                           Text(
-                                              '${auto['marca']}',
+                                              auto['marca'] != null
+                                              ? MarcaDeAutoEnum.getDisplayName(auto['marca']) ?? 'Estado desconocido'
+                                              : 'Estado desconocido',
                                               style: TextStyle(
                                                   fontSize: 18,
                                                   fontWeight: FontWeight.bold,
@@ -324,7 +333,9 @@ class _VistaAutoScreenState extends State<VistaAutoScreen> {
                                           const SizedBox(width: 40),
                                           // INFO TIPO
                                           Text(
-                                              '${auto['tipo']}',
+                                              auto['tipo'] != null
+                                                ? Tipo.getDisplayName(auto['tipo']) ?? 'Tipo desconocido'
+                                                : 'Tipo desconocido',
                                               style: TextStyle(
                                                   fontSize: 18,
                                                   fontWeight: FontWeight.bold,
@@ -398,7 +409,9 @@ class _VistaAutoScreenState extends State<VistaAutoScreen> {
                                           const SizedBox(width: 40),
                                           // INFO MOTOR
                                           Text(
-                                            '${auto['motor']}',
+                                            auto['motor'] != null
+                                              ? Motor.getDisplayName(auto['motor']) ?? 'Motor desconocido'
+                                              : 'Motor desconocido',
                                             style: TextStyle(
                                                 fontSize: 18,
                                                 fontWeight: FontWeight.bold,
@@ -422,7 +435,9 @@ class _VistaAutoScreenState extends State<VistaAutoScreen> {
                                           const SizedBox(width: 40),
                                           // INFO TRANSMISIÓN
                                           Text(
-                                            '${auto['transmision']}',
+                                            auto['transmision'] != null
+                                              ? Transmision.getDisplayName(auto['transmision']) ?? 'Transmisión desconocida'
+                                              : 'Transmisión desconocida',
                                             style: TextStyle(
                                                 fontSize: 18,
                                                 fontWeight: FontWeight.bold,
@@ -471,7 +486,9 @@ class _VistaAutoScreenState extends State<VistaAutoScreen> {
                                           const SizedBox(width: 40),
                                           // INFO UBICACIÓN
                                           Text(
-                                            '${auto['ubicacion']}',
+                                            auto['ubicacion'] != null
+                                                  ? Ubicacion.getDisplayName(auto['ubicacion']) ?? 'Ubicación desconocida'
+                                                  : 'Ubicación desconocida',
                                             style: TextStyle(
                                                 fontSize: 18,
                                                 fontWeight: FontWeight.bold,
@@ -495,7 +512,9 @@ class _VistaAutoScreenState extends State<VistaAutoScreen> {
                                           const SizedBox(width: 40),
                                           // INFO ESTADOS
                                           Text(
-                                            '${auto['estado']}',
+                                            auto['estado'] != null
+                                              ? EstadoEnum.getDisplayName(auto['estado']) ?? 'Estado desconocido'
+                                              : 'Estado desconocido',
                                             style: TextStyle(
                                                 fontSize: 18,
                                                 fontWeight: FontWeight.bold,

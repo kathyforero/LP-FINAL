@@ -16,4 +16,11 @@ enum Motor {
       orElse: () => throw Exception("Valor inválido para el enum Motor: $displayName"),
     ).backendValue;
   }
+
+  static String? getDisplayName(String? backendValue) {
+    return Motor.values.firstWhere(
+      (motor) => motor.backendValue == backendValue,
+      orElse: () => throw Exception("Motor no válido: $backendValue"),
+    ).displayName;
+  }
 }
