@@ -505,7 +505,9 @@ class _MainScreenState extends State<MainScreen> {
                             itemBuilder: (context, index) {
                               final auto = autos[index];
 
-                              return GestureDetector(
+                              return MouseRegion(
+                              cursor: SystemMouseCursors.click,
+                              child: GestureDetector(
                                 onTap: () {
                                   Navigator.push(
                                     context,
@@ -550,9 +552,7 @@ class _MainScreenState extends State<MainScreen> {
                                                 CrossAxisAlignment.start,
                                             children: [
                                               Text(
-                                                '${auto['marca'][0]}' +
-                                                '${auto['marca'][0]} '.toLowerCase() +
-                                                '${auto['modelo']}',
+                                                "${auto['marca'][0].toUpperCase()}${auto['marca'].substring(1).toLowerCase()} ${auto['modelo']}",
                                                 style: const TextStyle(
                                                   fontWeight: FontWeight.bold,
                                                   fontSize: 16,
@@ -567,8 +567,16 @@ class _MainScreenState extends State<MainScreen> {
                                               ),
                                               const SizedBox(height: 4),
                                               Text(
-                                                auto['ubicacion'] ??
-                                                    'Ubicación desconocida',
+                                                auto['ubicacion'] != null
+                                                ? auto['ubicacion']
+                                                    .replaceAll('_', ' ') // Reemplaza "_" con espacio
+                                                    .toLowerCase() // Convierte todo a minúsculas
+                                                    .split(' ') // Divide en palabras
+                                                    .map((word) => word.isNotEmpty
+                                                        ? '${word[0].toUpperCase()}${word.substring(1)}'
+                                                        : '')
+                                                    .join(' ') // Une las palabras con espacio
+                                                : 'Ubicación desconocida',
                                                 style: const TextStyle(
                                                     color: Colors.white),
                                               ),
@@ -588,7 +596,7 @@ class _MainScreenState extends State<MainScreen> {
                                     ),
                                   ),
                                 ),
-                              );
+                              ));
                             },
                           );
                         },
