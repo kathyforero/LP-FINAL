@@ -31,10 +31,12 @@ class _MainScreenState extends State<MainScreen> {
   List<String>? marcas;
   Map<String, List<String>> modelosPorMarca = {};
   List<String>? tipos;
+  List<Map<String, dynamic>>? _autos = [];
 
   bool isCargandoMarcas = true;
   bool isCargandoModelos = false;
   bool isCargandoTipos = true;
+    bool _cargandoAutos = true; // Para manejar el estado de carga
 
   @override
   void initState() {
@@ -42,7 +44,28 @@ class _MainScreenState extends State<MainScreen> {
     cargarUsuario();
     cargarMarcas();
     cargarTipos();
+    cargarAutos();
   }
+
+  Future<void> cargarAutos() async {
+  setState(() {
+      _cargandoAutos = true;
+    });
+
+    try {
+      List<Map<String, dynamic>>? autosCargados = await ApiServicio.obtenerTodosLosAutos();
+      setState(() {
+        _autos = autosCargados;
+      });
+    } catch (e) {
+      print("Error al cargar autos: $e");
+    } finally {
+      setState(() {
+        _cargandoAutos = false;
+      });
+    }
+  }
+
 
   Future<void> cargarUsuario() async {
     // Simula tiempo de carga o espera a datos válidos
@@ -474,173 +497,148 @@ class _MainScreenState extends State<MainScreen> {
                 ),
 
                 // Vehicle grid
-                FutureBuilder<List<Map<String, dynamic>>?>(
-                  future: ApiServicio.obtenerTodosLosAutos(),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const Center(child: CircularProgressIndicator());
-                    } else if (snapshot.hasError || snapshot.data == null) {
-                      return const Center(
-                          child: Text("Error al cargar los autos"));
-                    }
+                _cargandoAutos
+    ? const Center(child: CircularProgressIndicator()) // Indicador de carga
+    : (_autos == null || _autos!.isEmpty) // Verifica si _autos es null o vacío
+        ? const Center(
+            child: Text(
+              'No hay autos para mostrar.',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 20,
+                fontFamily: 'Calibri Light',
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          )
+        : Expanded(
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                const double itemWidth = 200;
+                const double itemHeight = 300;
+                int crossAxisCount = (constraints.maxWidth / itemWidth).floor();
 
-                    final autos = snapshot.data!;
+                return GridView.builder(
+                  padding: const EdgeInsets.all(16.0),
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: crossAxisCount,
+                    crossAxisSpacing: 16,
+                    mainAxisSpacing: 16,
+                    childAspectRatio: itemWidth / itemHeight,
+                  ),
+                  itemCount: _autos!.length, // Ahora sabemos que no es null
+                  itemBuilder: (context, index) {
+                    final auto = _autos![index];
 
-                    if (autos.length > 0) {
-                      return Expanded(
-                        child: LayoutBuilder(
-                          builder: (context, constraints) {
-                            const double itemWidth = 200;
-                            const double itemHeight = 300;
-                            int crossAxisCount =
-                                (constraints.maxWidth / itemWidth).floor();
-
-                            return GridView.builder(
-                              padding: const EdgeInsets.all(16.0),
-                              gridDelegate:
-                                  SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: crossAxisCount,
-                                crossAxisSpacing: 16,
-                                mainAxisSpacing: 16,
-                                childAspectRatio: itemWidth / itemHeight,
-                              ),
-                              itemCount: autos.length,
-                              itemBuilder: (context, index) {
-                                final auto = autos[index];
-
-                                return MouseRegion(
-                                    cursor: SystemMouseCursors.click,
-                                    child: GestureDetector(
-                                      onTap: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) =>
-                                                VistaAutoScreen(auto: auto),
-                                          ),
-                                        );
+                    return MouseRegion(
+                      cursor: SystemMouseCursors.click,
+                      child: GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => VistaAutoScreen(auto: auto),
+                            ),
+                          );
+                        },
+                        child: SizedBox(
+                          height: itemHeight,
+                          child: Card(
+                            color: const Color(0xFF2B193E),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            elevation: 4,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                ClipRRect(
+                                  borderRadius: const BorderRadius.vertical(
+                                    top: Radius.circular(12),
+                                  ),
+                                  child: SizedBox(
+                                    height: 120,
+                                    width: double.infinity,
+                                    child: Image.network(
+                                      '${auto['fotos'][0]}',
+                                      fit: BoxFit.contain,
+                                      loadingBuilder:
+                                          (context, child, loadingProgress) {
+                                        if (loadingProgress == null)
+                                          return child;
+                                        return const Center(
+                                            child:
+                                                CircularProgressIndicator());
                                       },
-                                      child: SizedBox(
-                                        height: itemHeight,
-                                        child: Card(
-                                          color: const Color(0xFF2B193E),
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(12),
-                                          ),
-                                          elevation: 4,
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              ClipRRect(
-                                                  borderRadius:
-                                                      const BorderRadius
-                                                          .vertical(
-                                                          top: Radius.circular(
-                                                              12)),
-                                                  child: SizedBox(
-                                                    height: 120,
-                                                    width: double.infinity,
-                                                    child: Image.network(
-                                                      '${auto['fotos'][0]}',
-                                                      fit: BoxFit.contain,
-                                                      loadingBuilder: (context,
-                                                          child,
-                                                          loadingProgress) {
-                                                        if (loadingProgress ==
-                                                            null) return child;
-                                                        return Center(
-                                                            child:
-                                                                CircularProgressIndicator());
-                                                      },
-                                                      errorBuilder: (context,
-                                                          error, stackTrace) {
-                                                        return Icon(Icons.error,
-                                                            size: 50,
-                                                            color: Colors.red);
-                                                      },
-                                                    ),
-                                                  )),
-                                              Padding(
-                                                padding:
-                                                    const EdgeInsets.all(8.0),
-                                                child: Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: [
-                                                    Text(
-                                                      auto['marca'] != null
-                                                          ? MarcaDeAutoEnum
-                                                                      .getDisplayName(
-                                                                          auto[
-                                                                              'marca']) !=
-                                                                  null
-                                                              ? "${MarcaDeAutoEnum.getDisplayName(auto['marca'])} ${auto['modelo']}"
-                                                              : 'Marca desconocida'
-                                                          : 'Marca desconocida',
-                                                      style: const TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        fontSize: 16,
-                                                        color: Colors.white,
-                                                      ),
-                                                    ),
-                                                    const SizedBox(height: 4),
-                                                    Text(
-                                                      '${auto['anio']} - ${auto['kilometraje']} km',
-                                                      style: const TextStyle(
-                                                          color: Colors.white),
-                                                    ),
-                                                    const SizedBox(height: 4),
-                                                    Text(
-                                                      auto['ubicacion'] != null
-                                                          ? Ubicacion.getDisplayName(
-                                                                  auto[
-                                                                      'ubicacion']) ??
-                                                              'Ubicación desconocida'
-                                                          : 'Ubicación desconocida',
-                                                      style: const TextStyle(
-                                                          color: Colors.white),
-                                                    ),
-                                                    const SizedBox(height: 4),
-                                                    Text(
-                                                      '\$${auto['precio']}',
-                                                      style: const TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        fontSize: 16,
-                                                        color: Colors.white,
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                            ],
-                                          ),
+                                      errorBuilder: (context, error,
+                                          stackTrace) {
+                                        return const Icon(Icons.error,
+                                            size: 50, color: Colors.red);
+                                      },
+                                    ),
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        auto['marca'] != null
+                                            ? MarcaDeAutoEnum.getDisplayName(
+                                                        auto['marca']) !=
+                                                    null
+                                                ? "${MarcaDeAutoEnum.getDisplayName(auto['marca'])} ${auto['modelo']}"
+                                                : 'Marca desconocida'
+                                            : 'Marca desconocida',
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 16,
+                                          color: Colors.white,
                                         ),
                                       ),
-                                    ));
-                              },
-                            );
-                          },
-                        ),
-                      );
-                    } else {
-                      return const Center(
-                        child: Text(
-                          'No hay autos para mostrar.',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 20,
-                            fontFamily: 'Calibri Light',
-                            fontWeight: FontWeight.bold,
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        '${auto['anio']} - ${auto['kilometraje']} km',
+                                        style: const TextStyle(
+                                            color: Colors.white),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        auto['ubicacion'] != null
+                                            ? Ubicacion.getDisplayName(
+                                                    auto['ubicacion']) ??
+                                                'Ubicación desconocida'
+                                            : 'Ubicación desconocida',
+                                        style: const TextStyle(
+                                            color: Colors.white),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        '\$${auto['precio']}',
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 16,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
-                      );
-                    }
+                      ),
+                    );
                   },
-                ),
+                );
+              },
+            ),
+          )
+
+
               ],
             ),
           ),

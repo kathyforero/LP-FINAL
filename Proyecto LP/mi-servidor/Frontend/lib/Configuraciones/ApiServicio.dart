@@ -237,19 +237,19 @@ class ApiServicio {
   static Future<List<Map<String, dynamic>>?> obtenerTodosLosAutos() async {
     final url = Uri.parse("${urlBase}autos"); // Construir la URL
 
-    try {
-      final response = await http.get(url);
-      if (response.statusCode == 200) {
-        // Decodifica el JSON y retorna los datos
-        final List<dynamic> listaAutos = json.decode(response.body);
-        return List<Map<String, dynamic>>.from(listaAutos);      
-      } else {
+      try {
+        final response = await http.get(url);
+        if (response.statusCode == 200) {
+          // Decodifica el JSON y retorna los datos
+          final List<dynamic> listaAutos = json.decode(response.body);
+          return List<Map<String, dynamic>>.from(listaAutos);      
+        } else {
+          return null;
+        }
+      } catch (e) {
         return null;
       }
-    } catch (e) {
-      return null;
-    }
-}
+  }
 
 
 
