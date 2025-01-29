@@ -485,123 +485,159 @@ class _MainScreenState extends State<MainScreen> {
 
                     final autos = snapshot.data!;
 
-                    return Expanded(
-                      child: LayoutBuilder(
-                        builder: (context, constraints) {
-                          const double itemWidth = 200;
-                          const double itemHeight = 300;
-                          int crossAxisCount =
-                              (constraints.maxWidth / itemWidth).floor();
+                    if (autos.length > 0) {
+                      return Expanded(
+                        child: LayoutBuilder(
+                          builder: (context, constraints) {
+                            const double itemWidth = 200;
+                            const double itemHeight = 300;
+                            int crossAxisCount =
+                                (constraints.maxWidth / itemWidth).floor();
 
-                          return GridView.builder(
-                            padding: const EdgeInsets.all(16.0),
-                            gridDelegate:
-                                SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: crossAxisCount,
-                              crossAxisSpacing: 16,
-                              mainAxisSpacing: 16,
-                              childAspectRatio: itemWidth / itemHeight,
-                            ),
-                            itemCount: autos.length,
-                            itemBuilder: (context, index) {
-                              final auto = autos[index];
+                            return GridView.builder(
+                              padding: const EdgeInsets.all(16.0),
+                              gridDelegate:
+                                  SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: crossAxisCount,
+                                crossAxisSpacing: 16,
+                                mainAxisSpacing: 16,
+                                childAspectRatio: itemWidth / itemHeight,
+                              ),
+                              itemCount: autos.length,
+                              itemBuilder: (context, index) {
+                                final auto = autos[index];
 
-                              return MouseRegion(
-                              cursor: SystemMouseCursors.click,
-                              child: GestureDetector(
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) =>
-                                          VistaAutoScreen(auto: auto),
-                                    ),
-                                  );
-                                },
-                                child: SizedBox(
-                                  height: itemHeight,
-                                  child: Card(
-                                    color: const Color(0xFF2B193E),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                    elevation: 4,
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        ClipRRect(
+                                return MouseRegion(
+                                    cursor: SystemMouseCursors.click,
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                VistaAutoScreen(auto: auto),
+                                          ),
+                                        );
+                                      },
+                                      child: SizedBox(
+                                        height: itemHeight,
+                                        child: Card(
+                                          color: const Color(0xFF2B193E),
+                                          shape: RoundedRectangleBorder(
                                             borderRadius:
-                                                const BorderRadius.vertical(
-                                                    top: Radius.circular(12)),
-                                            child: SizedBox(
-                                                height: 120,
-                                                width: double.infinity,
-                                                child: Image.network(
-                                                  '${auto['fotos'][0]}',
-                                                  fit: BoxFit.contain,
-                                                  loadingBuilder: (context, child, loadingProgress) {
-                                                    if (loadingProgress == null) return child;
-                                                    return Center(child: CircularProgressIndicator());
-                                                  },
-                                                  errorBuilder: (context, error, stackTrace) {
-                                                    return Icon(Icons.error, size: 50, color: Colors.red);
-                                                  },
-                                                ),)),
-                                        Padding(
-                                          padding: const EdgeInsets.all(8.0),
+                                                BorderRadius.circular(12),
+                                          ),
+                                          elevation: 4,
                                           child: Column(
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.start,
                                             children: [
-                                              Text(
-                                                auto['marca'] != null
-                                                ? MarcaDeAutoEnum.getDisplayName(auto['marca']) != null
-                                                    ? "${MarcaDeAutoEnum.getDisplayName(auto['marca'])} ${auto['modelo']}"
-                                                    : 'Marca desconocida'
-                                                : 'Marca desconocida',
-                                                style: const TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 16,
-                                                  color: Colors.white,
-                                                ),
-                                              ),
-                                              const SizedBox(height: 4),
-                                              Text(
-                                                '${auto['anio']} - ${auto['kilometraje']} km',
-                                                style: const TextStyle(
-                                                    color: Colors.white),
-                                              ),
-                                              const SizedBox(height: 4),
-                                              Text(
-                                                auto['ubicacion'] != null
-                                                  ? Ubicacion.getDisplayName(auto['ubicacion']) ?? 'Ubicación desconocida'
-                                                  : 'Ubicación desconocida',
-                                                style: const TextStyle(
-                                                    color: Colors.white),
-                                              ),
-                                              const SizedBox(height: 4),
-                                              Text(
-                                                '\$${auto['precio']}',
-                                                style: const TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 16,
-                                                  color: Colors.white,
+                                              ClipRRect(
+                                                  borderRadius:
+                                                      const BorderRadius
+                                                          .vertical(
+                                                          top: Radius.circular(
+                                                              12)),
+                                                  child: SizedBox(
+                                                    height: 120,
+                                                    width: double.infinity,
+                                                    child: Image.network(
+                                                      '${auto['fotos'][0]}',
+                                                      fit: BoxFit.contain,
+                                                      loadingBuilder: (context,
+                                                          child,
+                                                          loadingProgress) {
+                                                        if (loadingProgress ==
+                                                            null) return child;
+                                                        return Center(
+                                                            child:
+                                                                CircularProgressIndicator());
+                                                      },
+                                                      errorBuilder: (context,
+                                                          error, stackTrace) {
+                                                        return Icon(Icons.error,
+                                                            size: 50,
+                                                            color: Colors.red);
+                                                      },
+                                                    ),
+                                                  )),
+                                              Padding(
+                                                padding:
+                                                    const EdgeInsets.all(8.0),
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      auto['marca'] != null
+                                                          ? MarcaDeAutoEnum
+                                                                      .getDisplayName(
+                                                                          auto[
+                                                                              'marca']) !=
+                                                                  null
+                                                              ? "${MarcaDeAutoEnum.getDisplayName(auto['marca'])} ${auto['modelo']}"
+                                                              : 'Marca desconocida'
+                                                          : 'Marca desconocida',
+                                                      style: const TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        fontSize: 16,
+                                                        color: Colors.white,
+                                                      ),
+                                                    ),
+                                                    const SizedBox(height: 4),
+                                                    Text(
+                                                      '${auto['anio']} - ${auto['kilometraje']} km',
+                                                      style: const TextStyle(
+                                                          color: Colors.white),
+                                                    ),
+                                                    const SizedBox(height: 4),
+                                                    Text(
+                                                      auto['ubicacion'] != null
+                                                          ? Ubicacion.getDisplayName(
+                                                                  auto[
+                                                                      'ubicacion']) ??
+                                                              'Ubicación desconocida'
+                                                          : 'Ubicación desconocida',
+                                                      style: const TextStyle(
+                                                          color: Colors.white),
+                                                    ),
+                                                    const SizedBox(height: 4),
+                                                    Text(
+                                                      '\$${auto['precio']}',
+                                                      style: const TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        fontSize: 16,
+                                                        color: Colors.white,
+                                                      ),
+                                                    ),
+                                                  ],
                                                 ),
                                               ),
                                             ],
                                           ),
                                         ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ));
-                            },
-                          );
-                        },
-                      ),
-                    );
+                                      ),
+                                    ));
+                              },
+                            );
+                          },
+                        ),
+                      );
+                    } else {
+                      return const Center(
+                        child: Text(
+                          'No hay autos para mostrar.',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 20,
+                            fontFamily: 'Calibri Light',
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      );
+                    }
                   },
                 ),
               ],
