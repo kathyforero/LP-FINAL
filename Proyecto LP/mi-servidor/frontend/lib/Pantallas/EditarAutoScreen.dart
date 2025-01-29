@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:typed_data';
+import 'package:frontend/Pantallas/MainScreen.dart';
 import 'package:frontend/Pantallas/MisAutosScreen.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
@@ -409,7 +410,7 @@ class _EditarAutoScreenState extends State<EditarAutoScreen> {
           context, 'Auto eliminado exitosamente.', Colors.green);
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => MisAutosScreen()),
+        MaterialPageRoute(builder: (context) => MainScreen()),
       );
     } else {
       SnackBarHelper.showSnackBar(
