@@ -1,19 +1,12 @@
-import 'dart:convert';
-import 'dart:typed_data';
-import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
-import 'package:file_picker/file_picker.dart';
 import '../Enums/Ubicacion.dart';
 import '../Enums/MarcaDeAuto.dart';
 import '../Enums/Estado.dart';
 import '../Enums/Tipo.dart';
 import '../Enums/Transmision.dart';
 import '../Enums/Motor.dart';
-
-
 import '../Configuraciones/Usuario.dart';
-import '../Configuraciones/ApiServicio.dart';
-import '../Configuraciones/FirebaseStorageService.dart';
+
 
 // Crear Autos
 class VistaAutoScreen extends StatefulWidget {

@@ -4,7 +4,6 @@ import 'CrearAutoScreen.dart';
 import 'VistaAutoScreen.dart';
 import '../Widgets/MyPopUpMenu.dart';
 import '../Configuraciones/ApiServicio.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import "../Enums/Ubicacion.dart";
 import "../Enums/MarcaDeAuto.dart";
 
