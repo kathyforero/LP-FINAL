@@ -70,33 +70,38 @@ class _EditarAutoScreenState extends State<EditarAutoScreen> {
     super.initState();
     // Inicializar auto correctamente
     auto = widget.auto;
-    cargarMarcas();
-    cargarTipos();
-    cargarMotor();
-    cargarTransmision();
-    cargarUbicacion();
-    cargarEstados();
+
     placaController.text = auto['placa'] ?? '';
     precioController.text = auto['precio']?.toString() ?? '';
     anioController.text = auto['anio']?.toString() ?? '';
     kilometrajeController.text = auto['kilometraje']?.toString() ?? '';
     pesoController.text = auto['peso']?.toString() ?? '';
 
-    marcaSeleccionada = auto['marca'];
-    modeloSeleccionado = auto['modelo'];
-    tipoSeleccionado = auto['tipo'];
-    motorSeleccionado = auto['motor'];
-    transmisionSeleccionada = auto['transmision'];
-    ubicacionSeleccionada = auto['ubicacion'];
-    estadoSeleccionado = auto['estado'];
+    cargarMarcas();
+    cargarTipos();
+    cargarMotor();
+    cargarTransmision();
+    cargarUbicacion();
+    cargarEstados();
   }
 
   Future<void> cargarMarcas() async {
     try {
       final listaMarcas = await ApiServicio.obtenerMarcas();
       setState(() {
-        marcas = listaMarcas;
+        marcas = listaMarcas.toSet().toList(); // Elimina duplicados
         isCargandoMarcas = false;
+
+        // Convertir a minúsculas para comparación
+        String marcaAuto = auto['marca']?.toLowerCase() ?? '';
+
+        // Buscar la marca en la lista (también en minúsculas)
+        marcaSeleccionada = marcas?.firstWhere(
+            (marca) => marca.toLowerCase() == marcaAuto,
+            orElse: () => marcas!.isNotEmpty
+                ? marcas!.first
+                : '' // Si no se encuentra, selecciona la primera marca
+            );
       });
     } catch (e) {
       print('Error al cargar marcas: $e');
@@ -125,8 +130,15 @@ class _EditarAutoScreenState extends State<EditarAutoScreen> {
     try {
       final listaTipos = await ApiServicio.obtenerTipos();
       setState(() {
-        tipos = listaTipos;
+        tipos = listaTipos.toSet().toList(); // Elimina duplicados
         isCargandoTipos = false;
+
+        // Convertir a minúsculas para comparación
+        String tipoAuto = auto['tipo']?.toLowerCase() ?? '';
+
+        tipoSeleccionado = tipos?.firstWhere(
+            (tipo) => tipo.toLowerCase() == tipoAuto,
+            orElse: () => tipos!.isNotEmpty ? tipos!.first : '');
       });
     } catch (e) {
       print('Error al cargar tipos: $e');
@@ -139,8 +151,15 @@ class _EditarAutoScreenState extends State<EditarAutoScreen> {
     try {
       final listaMotor = await ApiServicio.obtenerMotor();
       setState(() {
-        motor = listaMotor;
+        motor = listaMotor.toSet().toList(); // Elimina duplicados
         isCargandoMotor = false;
+
+        // Convertir a minúsculas para comparación
+        String motorAuto = auto['motor']?.toLowerCase() ?? '';
+
+        motorSeleccionado = motor?.firstWhere(
+            (motor) => motor.toLowerCase() == motorAuto,
+            orElse: () => motor!.isNotEmpty ? motor!.first : '');
       });
     } catch (e) {
       print('Error al cargar motores: $e');
@@ -153,8 +172,15 @@ class _EditarAutoScreenState extends State<EditarAutoScreen> {
     try {
       final listaTransmision = await ApiServicio.obtenerTransmision();
       setState(() {
-        transmision = listaTransmision;
+        transmision = listaTransmision.toSet().toList(); // Elimina duplicados
         isCargandoTransmision = false;
+
+        // Convertir a minúsculas para comparación
+        String transmisionAuto = auto['transmision']?.toLowerCase() ?? '';
+
+        transmisionSeleccionada = transmision?.firstWhere(
+            (transmision) => transmision.toLowerCase() == transmisionAuto,
+            orElse: () => transmision!.isNotEmpty ? transmision!.first : '');
       });
     } catch (e) {
       print('Error al cargar transmisiones: $e');
@@ -167,8 +193,15 @@ class _EditarAutoScreenState extends State<EditarAutoScreen> {
     try {
       final listaUbicacion = await ApiServicio.obtenerUbicacion();
       setState(() {
-        ubicacion = listaUbicacion;
+        ubicacion = listaUbicacion.toSet().toList(); // Elimina duplicados
         isCargandoUbicacion = false;
+
+        // Convertir a minúsculas para comparación
+        String ubicacionAuto = auto['ubicacion']?.toLowerCase() ?? '';
+
+        ubicacionSeleccionada = ubicacion?.firstWhere(
+            (ubicacion) => ubicacion.toLowerCase() == ubicacionAuto,
+            orElse: () => ubicacion!.isNotEmpty ? ubicacion!.first : '');
       });
     } catch (e) {
       print('Error al cargar ubicaciones: $e');
@@ -181,8 +214,15 @@ class _EditarAutoScreenState extends State<EditarAutoScreen> {
     try {
       final listaEstados = await ApiServicio.obtenerEstados();
       setState(() {
-        estados = listaEstados;
+        estados = listaEstados.toSet().toList(); // Elimina duplicados
         isCargandoEstados = false;
+
+        // Convertir a minúsculas para comparación
+        String estadoAuto = auto['estado']?.toLowerCase() ?? '';
+
+        estadoSeleccionado = estados?.firstWhere(
+            (estado) => estado.toLowerCase() == estadoAuto,
+            orElse: () => estados!.isNotEmpty ? estados!.first : '');
       });
     } catch (e) {
       print('Error al cargar estados: $e');
@@ -257,9 +297,9 @@ class _EditarAutoScreenState extends State<EditarAutoScreen> {
     return false;
   }
 
-  Future<void> guardarAuto() async {
+  Future<void> actualizarAuto() async {
     // Capturar valores desde los controladores y Dropdown
-    String placa = placaController.text.trim();
+    String placa = placaController.text.trim().toUpperCase();
     double? precio = double.tryParse(precioController.text.trim());
     String? marca = MarcaDeAutoEnum.getBackendValue(marcaSeleccionada);
     String? modelo = modeloSeleccionado;
@@ -336,18 +376,44 @@ class _EditarAutoScreenState extends State<EditarAutoScreen> {
       'fotos': urls,
     };
 
-    bool exito = await ApiServicio.crearAuto(autoData);
+    bool exito = await ApiServicio.actualizarAuto(autoData);
 
     if (exito) {
       SnackBarHelper.showSnackBar(
-          context, 'Auto guardado exitosamente.', Colors.green);
+          context, 'Auto actualizado exitosamente.', Colors.green);
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => MisAutosScreen()),
       );
     } else {
       SnackBarHelper.showSnackBar(
-          context, 'Error al guardar el auto.', Colors.red);
+          context, 'Error al actualizar el auto.', Colors.red);
+    }
+  }
+
+  Future<void> eliminarAuto() async {
+    String placa = placaController.text.trim().toUpperCase();
+
+    if (auto['placa'] != placa) {
+      SnackBarHelper.showSnackBar(
+          context,
+          'No puedes cambiarle la placa a un auto. Para ello, crea uno nuevo!',
+          Colors.red);
+      return;
+    }
+
+    bool exito = await ApiServicio.eliminarAuto(placa);
+
+    if (exito) {
+      SnackBarHelper.showSnackBar(
+          context, 'Auto eliminado exitosamente.', Colors.green);
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => MisAutosScreen()),
+      );
+    } else {
+      SnackBarHelper.showSnackBar(
+          context, 'Error al eliminar el auto.', Colors.red);
     }
   }
 
@@ -1176,7 +1242,20 @@ class _EditarAutoScreenState extends State<EditarAutoScreen> {
 
                                     // Guardar ************************************************
                                     ElevatedButton(
-                                      onPressed: guardarAuto,
+                                      onPressed: () {
+                                        bool datosValidos = validarYVerificar(
+                                          context,
+                                          placaController.text,
+                                          precioController.text,
+                                          anioController.text,
+                                          kilometrajeController.text,
+                                          pesoController.text,
+                                        );
+
+                                        if (datosValidos) {
+                                          actualizarAuto(); // Solo se ejecuta si los datos son válidos
+                                        }
+                                      },
                                       style: ElevatedButton.styleFrom(
                                         backgroundColor:
                                             const Color(0xFF9576DA),
@@ -1189,7 +1268,7 @@ class _EditarAutoScreenState extends State<EditarAutoScreen> {
                                     const SizedBox(height: 10),
                                     // ELIMINAR AUTO ************************************************
                                     ElevatedButton(
-                                      onPressed: guardarAuto,
+                                      onPressed: eliminarAuto,
                                       style: ElevatedButton.styleFrom(
                                         backgroundColor:
                                             const Color(0xFF9576DA),

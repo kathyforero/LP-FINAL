@@ -235,7 +235,7 @@ class _CrearAutoScreenState extends State<CrearAutoScreen> {
 
   Future<void> guardarAuto() async {
     // Capturar valores desde los controladores y Dropdown
-    String placa = placaController.text.trim();
+    String placa = placaController.text.trim().toUpperCase();
     double? precio = double.tryParse(precioController.text.trim());
     String? marca = MarcaDeAutoEnum.getBackendValue(marcaSeleccionada);
     String? modelo = modeloSeleccionado;
