@@ -23,4 +23,11 @@ enum EstadoEnum {
       return null; // Retorna null si no encuentra un valor válido
     }
   }
+
+  static String? getDisplayName(String? backendValue) {
+  return EstadoEnum.values.firstWhere(
+    (estado) => estado.backendValue == backendValue,
+    orElse: () => throw Exception("Estado no válido: $backendValue"),
+  ).displayName;
+}
 }

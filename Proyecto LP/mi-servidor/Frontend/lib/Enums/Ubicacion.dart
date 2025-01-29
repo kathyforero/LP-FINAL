@@ -35,4 +35,12 @@ enum Ubicacion {
       orElse: () => throw Exception("Valor inválido para el enum Ubicacion: $displayName"),
     ).backendValue;
   }
+
+  static String? getDisplayName(String? backendValue) {
+    return Ubicacion.values.firstWhere(
+      (ubicacion) => ubicacion.backendValue == backendValue,
+      orElse: () => throw Exception("Valor inválido para el enum Ubicacion: $backendValue"),
+    ).displayName;
+  }
+
 }

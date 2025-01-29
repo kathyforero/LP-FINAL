@@ -20,4 +20,11 @@ enum Tipo {
       orElse: () => throw Exception("Valor inválido para el enum Tipo: $displayName"),
     ).backendValue;
   }
+
+  static String? getDisplayName(String? backendValue) {
+    return Tipo.values.firstWhere(
+      (tipo) => tipo.backendValue == backendValue,
+      orElse: () => throw Exception("Tipo no válido: $backendValue"),
+    ).displayName;
+  }
 }

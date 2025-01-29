@@ -5,6 +5,8 @@ import 'VistaAutoScreen.dart';
 import '../Widgets/MyPopUpMenu.dart';
 import '../Configuraciones/ApiServicio.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import "../Enums/Ubicacion.dart";
+import "../Enums/MarcaDeAuto.dart";
 
 // Pantalla principal (nueva)
 class MainScreen extends StatefulWidget {
@@ -554,7 +556,11 @@ class _MainScreenState extends State<MainScreen> {
                                                 CrossAxisAlignment.start,
                                             children: [
                                               Text(
-                                                "${auto['marca'][0].toUpperCase()}${auto['marca'].substring(1).toLowerCase()} ${auto['modelo']}",
+                                                auto['marca'] != null
+                                                ? MarcaDeAutoEnum.getDisplayName(auto['marca']) != null
+                                                    ? "${MarcaDeAutoEnum.getDisplayName(auto['marca'])} ${auto['modelo']}"
+                                                    : 'Marca desconocida'
+                                                : 'Marca desconocida',
                                                 style: const TextStyle(
                                                   fontWeight: FontWeight.bold,
                                                   fontSize: 16,
@@ -570,15 +576,8 @@ class _MainScreenState extends State<MainScreen> {
                                               const SizedBox(height: 4),
                                               Text(
                                                 auto['ubicacion'] != null
-                                                ? auto['ubicacion']
-                                                    .replaceAll('_', ' ') // Reemplaza "_" con espacio
-                                                    .toLowerCase() // Convierte todo a minúsculas
-                                                    .split(' ') // Divide en palabras
-                                                    .map((word) => word.isNotEmpty
-                                                        ? '${word[0].toUpperCase()}${word.substring(1)}'
-                                                        : '')
-                                                    .join(' ') // Une las palabras con espacio
-                                                : 'Ubicación desconocida',
+                                                  ? Ubicacion.getDisplayName(auto['ubicacion']) ?? 'Ubicación desconocida'
+                                                  : 'Ubicación desconocida',
                                                 style: const TextStyle(
                                                     color: Colors.white),
                                               ),
