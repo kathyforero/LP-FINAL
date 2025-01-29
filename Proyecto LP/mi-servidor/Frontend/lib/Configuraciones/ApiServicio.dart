@@ -249,18 +249,18 @@ class ApiServicio {
   static Future<List<Map<String, dynamic>>?> obtenerTodosLosAutos() async {
     final url = Uri.parse("${urlBase}autos"); // Construir la URL
 
-    try {
-      final response = await http.get(url);
-      if (response.statusCode == 200) {
-        // Decodifica el JSON y retorna los datos
-        final List<dynamic> listaAutos = json.decode(response.body);
-        return List<Map<String, dynamic>>.from(listaAutos);
-      } else {
+      try {
+        final response = await http.get(url);
+        if (response.statusCode == 200) {
+          // Decodifica el JSON y retorna los datos
+          final List<dynamic> listaAutos = json.decode(response.body);
+          return List<Map<String, dynamic>>.from(listaAutos);      
+        } else {
+          return null;
+        }
+      } catch (e) {
         return null;
       }
-    } catch (e) {
-      return null;
-    }
   }
 
   static Future<List<Map<String, dynamic>>?> obtenerAutosPorUsuario(
@@ -331,4 +331,39 @@ class ApiServicio {
       return false;
     }
   }
+
+  static Future<List<Map<String, dynamic>>?> obtenerAutosFiltrados({
+      String? marca,
+      int? kilometrajeMin,
+      int? kilometrajeMax,
+      double? precioMin,
+      double? precioMax,
+      String? tipo,
+    }) async {
+    try {
+      // Construir la URL con los filtros dinámicos
+      Uri uri = Uri.parse("${urlBase}autos/filtrar").replace(queryParameters: {
+        if (marca != null) "marca": marca,
+        if (kilometrajeMin != null) "kilometrajeMin": kilometrajeMin.toString(),
+        if (kilometrajeMax != null) "kilometrajeMax": kilometrajeMax.toString(),
+        if (precioMin != null) "precioMin": precioMin.toString(),
+        if (precioMax != null) "precioMax": precioMax.toString(),
+        if (tipo != null) "tipo": tipo,
+      });
+
+      // Realizar la petición HTTP
+      final response = await http.get(uri);
+
+      if (response.statusCode == 200) {
+        return List<Map<String, dynamic>>.from(json.decode(response.body));
+      } else {
+        print("Error ${response.statusCode}: ${response.body}");
+        return null;
+      }
+    } catch (e) {
+      print("Error en la solicitud de autos filtrados: $e");
+      return null;
+    }
+  }
 }
+
