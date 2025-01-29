@@ -3,8 +3,8 @@ package com.miapp.mi_servidor.Enums;
 public enum Motor {
     GASOLINA("Gasolina"),
     DIESEL("Diesel"),
-    ELÉCTRICO("Electrico"),
-    HÍBRIDO("Hibrido"),
+    ELECTRICO("Electrico"),
+    HIBRIDO("Hibrido"),
     GAS("Gas");
 
     private final String displayName;
@@ -16,7 +16,7 @@ public enum Motor {
     public String getDisplayName() {
         return displayName;
     }
-    
+
     public static Motor fromValue(String value) {
         for (Motor motor : Motor.values()) {
             if (motor.getDisplayName().equalsIgnoreCase(value)) {

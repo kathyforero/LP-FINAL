@@ -1,38 +1,38 @@
 enum Ubicacion {
-  azuay("Azuay"),
-  bolivar("Bolivar"),
-  canar("Cañar"),
-  carchi("Carchi"),
-  chimborazo("Chimborazo"),
-  cotopaxi("Cotopaxi"),
-  elOro("El Oro"),
-  esmeraldas("Esmeraldas"),
-  galapagos("Galapagos"),
-  guayas("Guayas"),
-  imbabura("Imbabura"),
-  loja("Loja"),
-  losRios("Los Rios"),
-  manabi("Manabi"),
-  moronaSantiago("Morona Santiago"),
-  napo("Napo"),
-  orellana("Orellana"),
-  pastaza("Pastaza"),
-  pichincha("Pichincha"),
-  santaElena("Santa Elena"),
-  santoDomingoDeLosTsachilas("Santo Domingo de los Tsachilas"),
-  sucumbios("Sucumbios"),
-  tungurahua("Tungurahua"),
-  zamoraChinchipe("Zamora Chinchipe");
+  azuay("Azuay", "AZUAY"),
+  bolivar("Bolivar", "BOLIVAR"),
+  canar("Cañar", "CAÑAR"),
+  carchi("Carchi", "CARCHI"),
+  chimborazo("Chimborazo", "CHIMBORAZO"),
+  cotopaxi("Cotopaxi", "COTOPAXI"),
+  elOro("El Oro", "EL_ORO"),
+  esmeraldas("Esmeraldas", "ESMERALDAS"),
+  galapagos("Galapagos", "GALAPAGOS"),
+  guayas("Guayas", "GUAYAS"),
+  imbabura("Imbabura", "IMBABURA"),
+  loja("Loja", "LOJA"),
+  losRios("Los Rios", "LOS_RIOS"),
+  manabi("Manabi", "MANABI"),
+  moronaSantiago("Morona Santiago", "MORONA_SANTIAGO"), 
+  napo("Napo", "NAPO"),
+  orellana("Orellana", "ORELLANA"),
+  pastaza("Pastaza", "PASTAZA"),
+  pichincha("Pichincha", "PICHINCHA"),
+  santaElena("Santa Elena", "SANTA_ELENA"),
+  santoDomingoDeLosTsachilas("Santo Domingo de los Tsachilas", "SANTO_DOMINGO_DE_LOS_TSACHILAS"),
+  sucumbios("Sucumbios", "SUCUMBIOS"),
+  tungurahua("Tungurahua", "TUNGURAHUA"),
+  zamoraChinchipe("Zamora Chinchipe", "ZAMORA_CHINCHIPE");
 
   final String displayName;
+  final String backendValue;
 
-  const Ubicacion(this.displayName);
+  const Ubicacion(this.displayName, this.backendValue);
 
-  // Método para obtener el valor del backend desde el displayName
   static String? getBackendValue(String? displayName) {
     return Ubicacion.values.firstWhere(
       (ubicacion) => ubicacion.displayName == displayName,
       orElse: () => throw Exception("Valor inválido para el enum Ubicacion: $displayName"),
-    ).name; // Devuelve el nombre del enum para el backend
+    ).backendValue;
   }
 }

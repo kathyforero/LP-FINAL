@@ -214,7 +214,7 @@ class _CrearAutoScreenState extends State<CrearAutoScreen> {
     // Capturar valores desde los controladores y Dropdown
     String placa = placaController.text.trim();
     double? precio = double.tryParse(precioController.text.trim());
-    String? marca = MarcaDeAutoEnum.fromDisplayName(marcaSeleccionada)?.displayName;
+    String? marca = MarcaDeAutoEnum.getBackendValue(marcaSeleccionada);
     String? modelo = modeloSeleccionado;
     String? tipo = Tipo.getBackendValue(tipoSeleccionado);
     int? anio = int.tryParse(anioController.text.trim());
