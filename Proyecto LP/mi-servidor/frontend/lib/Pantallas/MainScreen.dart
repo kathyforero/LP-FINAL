@@ -534,15 +534,17 @@ class _MainScreenState extends State<MainScreen> {
                                             child: SizedBox(
                                                 height: 120,
                                                 width: double.infinity,
-                                                child: CachedNetworkImage(
-                                                  imageUrl:
-                                                      '${auto['fotos'][0]}',
-                                                  placeholder: (context, url) =>
-                                                      CircularProgressIndicator(),
-                                                  errorWidget:
-                                                      (context, url, error) =>
-                                                          Icon(Icons.error),
-                                                ))),
+                                                child: Image.network(
+                                                  '${auto['fotos'][0]}',
+                                                  fit: BoxFit.contain,
+                                                  loadingBuilder: (context, child, loadingProgress) {
+                                                    if (loadingProgress == null) return child;
+                                                    return Center(child: CircularProgressIndicator());
+                                                  },
+                                                  errorBuilder: (context, error, stackTrace) {
+                                                    return Icon(Icons.error, size: 50, color: Colors.red);
+                                                  },
+                                                ),)),
                                         Padding(
                                           padding: const EdgeInsets.all(8.0),
                                           child: Column(

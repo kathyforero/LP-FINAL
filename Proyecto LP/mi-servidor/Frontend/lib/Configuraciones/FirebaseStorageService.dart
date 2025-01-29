@@ -12,8 +12,9 @@ class FirebaseStorageService {
         String filePath = "autos/${DateTime.now().millisecondsSinceEpoch}.png";
         Reference ref = _storage.ref().child(filePath);
 
-        // ✅ Usar putData() en lugar de putFile()
-        UploadTask uploadTask = ref.putData(imagen);
+        SettableMetadata metadata = SettableMetadata(contentType: "image/png");
+
+        UploadTask uploadTask = ref.putData(imagen, metadata);
         TaskSnapshot snapshot = await uploadTask.whenComplete(() => {});
 
         String url = await snapshot.ref.getDownloadURL();
