@@ -6,6 +6,7 @@ import java.util.List;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
 import jakarta.validation.constraints.Pattern;
 
@@ -34,7 +35,7 @@ public class Auto {
     private String placa;
 
     @NotNull(message = "El kilometraje no puede ser nulo.")
-    @Positive(message = "El kilometraje debe ser mayor a 0.")
+    @PositiveOrZero(message = "El kilometraje debe ser 0 o mayor.")
     private int kilometraje;
 
     @NotNull(message = "El motor no puede ser nulo.")
