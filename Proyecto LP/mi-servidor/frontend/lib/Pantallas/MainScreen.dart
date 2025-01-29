@@ -6,6 +6,8 @@ import '../Widgets/MyPopUpMenu.dart';
 import '../Configuraciones/ApiServicio.dart';
 import "../Enums/Ubicacion.dart";
 import "../Enums/MarcaDeAuto.dart";
+import "../Enums/Tipo.dart";
+
 
 // Pantalla principal (nueva)
 class MainScreen extends StatefulWidget {
@@ -46,6 +48,51 @@ class _MainScreenState extends State<MainScreen> {
     cargarTipos();
     cargarAutos();
   }
+
+  Future<void> buscarAutosConFiltros() async {
+    setState(() {
+      _cargandoAutos = true;
+    });
+
+    try {
+      // Obtener valores de los filtros
+      String? marca = _marcaSeleccionada != null
+        ? MarcaDeAutoEnum.getBackendValue(_marcaSeleccionada)
+        : null;
+      String? tipo = _tipoSeleccionado != null
+        ? Tipo.getBackendValue(_tipoSeleccionado)
+        : null;
+      int? kilometrajeMin =
+          _controladorKmDesde.text.isNotEmpty ? int.tryParse(_controladorKmDesde.text) : null;
+      int? kilometrajeMax =
+          _controladorKmHasta.text.isNotEmpty ? int.tryParse(_controladorKmHasta.text) : null;
+      double? precioMin =
+          _controladorPrecioDesde.text.isNotEmpty ? double.tryParse(_controladorPrecioDesde.text) : null;
+      double? precioMax =
+          _controladorPrecioHasta.text.isNotEmpty ? double.tryParse(_controladorPrecioHasta.text) : null;
+
+      // Llamar a la API con los filtros seleccionados
+      List<Map<String, dynamic>>? autosFiltrados = await ApiServicio.obtenerAutosFiltrados(
+        marca: marca,
+        kilometrajeMin: kilometrajeMin,
+        kilometrajeMax: kilometrajeMax,
+        precioMin: precioMin,
+        precioMax: precioMax,
+        tipo: tipo,
+      );
+
+      setState(() {
+        _autos = autosFiltrados ?? [];
+      });
+    } catch (e) {
+      print("Error al filtrar autos: $e");
+    } finally {
+      setState(() {
+        _cargandoAutos = false;
+      });
+    }
+  }
+
 
   Future<void> cargarAutos() async {
   setState(() {
@@ -392,7 +439,9 @@ class _MainScreenState extends State<MainScreen> {
                         ),
                   const SizedBox(height: 20),
                   ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      buscarAutosConFiltros();
+                    },
                     style: ElevatedButton.styleFrom(
                       backgroundColor:
                           const Color(0xFF9576DA), // Fondo del botón
@@ -419,6 +468,7 @@ class _MainScreenState extends State<MainScreen> {
                               _controladorPrecioDesde.clear();
                               _controladorPrecioHasta
                                   .clear(); // Limpiar el TextFormField
+                              cargarAutos();
                             });
                           });
                         },
