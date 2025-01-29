@@ -31,7 +31,7 @@ class EditarAutoScreen extends StatefulWidget {
 
 class _EditarAutoScreenState extends State<EditarAutoScreen> {
   late Map<String, dynamic> auto;
-  late List<String> _fotosSeleccionadas1;
+  late List<String> _fotosSeleccionadas;
 
   final TextEditingController placaController = TextEditingController();
   final TextEditingController precioController = TextEditingController();
@@ -47,7 +47,7 @@ class _EditarAutoScreenState extends State<EditarAutoScreen> {
   String? transmisionSeleccionada;
   String? ubicacionSeleccionada;
   String? estadoSeleccionado;
-  final List<Uint8List> _fotosSeleccionadas = [];
+  //final List<Uint8List> _fotosSeleccionadas = [];
   int indiceActual = 0;
 
   List<String>? marcas;
@@ -84,6 +84,8 @@ class _EditarAutoScreenState extends State<EditarAutoScreen> {
     cargarTransmision();
     cargarUbicacion();
     cargarEstados();
+
+    _fotosSeleccionadas = List<String>.from(widget.auto['fotos'] ?? []);
   }
 
   Future<void> cargarMarcas() async {
@@ -359,6 +361,14 @@ class _EditarAutoScreenState extends State<EditarAutoScreen> {
       return;
     }
 
+    if (auto['placa'] != placa) {
+      SnackBarHelper.showSnackBar(
+          context,
+          'No puedes cambiarle la placa a un auto. Para ello, crea uno nuevo!',
+          Colors.red);
+      return;
+    }
+
     // Crear el JSON para enviar al backend
     Map<String, dynamic> autoData = {
       'placa': placa,
@@ -515,11 +525,10 @@ class _EditarAutoScreenState extends State<EditarAutoScreen> {
                                 width: 650,
                                 height: 576,
                                 child: _fotosSeleccionadas.isNotEmpty
-                                    ? Image.memory(
-                                        _fotosSeleccionadas[
-                                            indiceActual], // Muestra la imagen actual desde los bytes
-                                        fit: BoxFit.contain,
-                                      )
+                                    ? Image.network(
+                                      _fotosSeleccionadas[indiceActual],
+                                      fit: BoxFit.contain,
+                                    )
                                     : const Image(
                                         image: NetworkImage(
                                             'https://i.postimg.cc/qRYLrN7X/preview.png'), // Placeholder
