@@ -209,22 +209,6 @@ class _CrearAutoScreenState extends State<CrearAutoScreen> {
   }
 
   Future<void> guardarAuto() async {
-    if (_fotosSeleccionadas.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text('Por favor selecciona al menos una imagen.')),
-      );
-      return;
-    }
-
-    FirebaseStorageService storageService = FirebaseStorageService();
-    List<String> urls = await storageService.subirFotos(_fotosSeleccionadas);
-
-    if (urls.isEmpty) {
-      SnackBarHelper.showSnackBar(context, 'Error al subir imágenes.', Colors.red);
-      return;
-    }
-
     // Capturar valores desde los controladores y Dropdown
     String placa = placaController.text.trim();
     double? precio = double.tryParse(precioController.text.trim());
@@ -255,6 +239,33 @@ class _CrearAutoScreenState extends State<CrearAutoScreen> {
           SnackBarHelper.showSnackBar(context, 'Por favor completa todos los campos.', Colors.blueGrey);
       return;
     }
+
+    if (_fotosSeleccionadas.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text('Por favor selecciona al menos una imagen.')),
+      );
+      return;
+    }
+
+    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text("Por favor espere"),
+                        backgroundColor: Colors.blue,
+                        duration: Duration(seconds: 4),
+                      ),
+                    );
+
+    
+    FirebaseStorageService storageService = FirebaseStorageService();
+    List<String> urls = await storageService.subirFotos(_fotosSeleccionadas);
+
+    if (urls.isEmpty) {
+      SnackBarHelper.showSnackBar(context, 'Error al subir imágenes.', Colors.red);
+      return;
+    }
+
+    
 
     // Crear el JSON para enviar al backend
     Map<String, dynamic> autoData = {
@@ -554,7 +565,8 @@ class _CrearAutoScreenState extends State<CrearAutoScreen> {
                                           : SizedBox(
                                               width: 550,
                                               child: DropdownButtonFormField<String>(
-                                                value: marcaSeleccionada,
+                                                value: 
+                                                marcaSeleccionada,
                                                 items: marcas?.map((marca) {
                                                   return DropdownMenuItem(
                                                     value: marca,
@@ -567,6 +579,7 @@ class _CrearAutoScreenState extends State<CrearAutoScreen> {
                                                 onChanged: (value) {
                                                   setState(() {
                                                     marcaSeleccionada = value;
+                                                    modeloSeleccionado = null;
                                                     cargarModelos(value!);
                                                   });
                                                 },
