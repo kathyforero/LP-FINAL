@@ -1,4 +1,5 @@
 import 'dart:typed_data';
+import 'package:frontend/Pantallas/MainScreen.dart';
 import 'package:frontend/Widgets/SnackBarHelper.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
@@ -192,6 +193,21 @@ class _CrearAutoScreenState extends State<CrearAutoScreen> {
     });
   }
 
+  void eliminarImagenActual() {
+    setState(() {
+      if (_fotosSeleccionadas.isNotEmpty) {
+        _fotosSeleccionadas.removeAt(indiceActual);
+
+        // Ajustar el índice si es necesario
+        if (indiceActual >= _fotosSeleccionadas.length && indiceActual > 0) {
+          indiceActual--;
+        }
+      }else{
+        SnackBarHelper.showSnackBar(context, "¡No hay imagenes que borrar!", Colors.grey);
+      }
+    });
+  }
+
   Future<void> guardarAuto() async {
     if (_fotosSeleccionadas.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -205,9 +221,7 @@ class _CrearAutoScreenState extends State<CrearAutoScreen> {
     List<String> urls = await storageService.subirFotos(_fotosSeleccionadas);
 
     if (urls.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Error al subir imágenes.')),
-      );
+      SnackBarHelper.showSnackBar(context, 'Error al subir imágenes.', Colors.red);
       return;
     }
 
@@ -264,6 +278,10 @@ class _CrearAutoScreenState extends State<CrearAutoScreen> {
 
     if (exito) {
       SnackBarHelper.showSnackBar(context, 'Auto guardado exitosamente.', Colors.green);
+      Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => MainScreen()),
+                  );
     } else {
       SnackBarHelper.showSnackBar(context, 'Error al guardar el auto.', Colors.red);
     }
@@ -328,19 +346,15 @@ class _CrearAutoScreenState extends State<CrearAutoScreen> {
                                     width: 45, // Ancho de la imagen
                                     height: 50, // Alto de la imagen
                                     child: MouseRegion(
-                                        cursor: SystemMouseCursors.click,
-                                        child: GestureDetector(
-                                          onTap: () {
-                                            print("Imagen presionada");
-                                            // Lógica al presionar el botón
-                                          },
-                                          child: Image(
-                                            image: NetworkImage(
-                                                'https://i.postimg.cc/y6gjPyff/Trash.png'),
-                                            fit: BoxFit
-                                                .contain, // Asegura que la imagen cubra el área
-                                          ),
-                                        )),
+                                      cursor: SystemMouseCursors.click, // Cambia el cursor a una mano al pasar el mouse
+                                      child: GestureDetector(
+                                        onTap: eliminarImagenActual, // Llama al método modular
+                                        child: Image.network(
+                                          'https://i.postimg.cc/y6gjPyff/Trash.png',
+                                          fit: BoxFit.contain, // Ajusta la imagen dentro del área
+                                        ),
+                                      ),
+                                    ),
                                   ),
 
                                   SizedBox(width: 50),
