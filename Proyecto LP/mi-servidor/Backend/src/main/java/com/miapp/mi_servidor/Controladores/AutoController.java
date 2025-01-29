@@ -46,7 +46,6 @@ public class AutoController {
 
     @PostMapping
     public ResponseEntity<Map<String, Object>> guardarAuto(@Valid @RequestBody Auto auto, BindingResult bindingResult) throws Exception {
-        System.out.println("HOLA");
         System.out.println(auto);
         // Validar si el auto ya existe
         if (autoServicio.obtenerAutoValidar(auto.getPlaca())) {

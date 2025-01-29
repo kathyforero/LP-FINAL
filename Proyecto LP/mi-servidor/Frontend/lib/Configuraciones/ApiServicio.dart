@@ -1,6 +1,6 @@
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-
+import "../Widgets/SnackBarHelper.dart";
 
 class ApiServicio {
     //static String urlBase='https://mi-backend-106452854733.us-central1.run.app/api/';
@@ -210,6 +210,30 @@ class ApiServicio {
     }
   }
 
+
+
+   static Future<bool> crearAuto(Map<String, dynamic> autoData) async {
+    try {
+      print('JSON enviado al backend: ${jsonEncode(autoData)}');
+      
+      final response = await http.post(
+        Uri.parse('${urlBase}autos'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(autoData),
+      );
+
+      if (response.statusCode == 200) {
+        print('Auto guardado exitosamente.');
+        return true;
+      } else {
+        print('Error ${response.statusCode}: ${response.body}');
+        return false;
+      }
+    } catch (e) {
+      print('Error en la solicitud: $e');
+      return false;
+    }
+  }
 
 
 

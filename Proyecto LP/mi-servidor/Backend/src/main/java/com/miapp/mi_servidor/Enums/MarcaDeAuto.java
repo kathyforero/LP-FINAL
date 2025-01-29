@@ -87,14 +87,6 @@ public enum MarcaDeAuto {
             addLast("Picanto");
         }
     }),
-    LAND_ROVER("Land Rover", new ArrayList<String>() {
-        {
-            addLast("Range Rover");
-            addLast("Discovery");
-            addLast("Defender");
-            addLast("Evoque");
-        }
-    }),
     MASERATI("Maserati", new ArrayList<String>() {
         {
             addLast("Ghibli");
@@ -112,17 +104,6 @@ public enum MarcaDeAuto {
             addLast("CX-3");
             addLast("CX-5");
             addLast("CX-9");
-        }
-    }),
-    MERCEDES_BENZ("Mercedes-Benz", new ArrayList<String>() {
-        {
-            addLast("A-Class");
-            addLast("C-Class");
-            addLast("E-Class");
-            addLast("S-Class");
-            addLast("GLA");
-            addLast("GLC");
-            addLast("GLE");
         }
     }),
     NISSAN("Nissan", new ArrayList<String>() {
@@ -206,6 +187,15 @@ public enum MarcaDeAuto {
     @Override
     public String toString() {
         return name + " models: " + models.toString();
+    }
+
+    public static MarcaDeAuto fromValue(String value) {
+        for (MarcaDeAuto marca : MarcaDeAuto.values()) {
+            if (marca.getName().equalsIgnoreCase(value)) {
+                return marca;
+            }
+        }
+        throw new IllegalArgumentException("Valor inválido para el enum MarcaDeAuto: " + value);
     }
 
 }

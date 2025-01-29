@@ -16,4 +16,13 @@ public enum Motor {
     public String getDisplayName() {
         return displayName;
     }
+    
+    public static Motor fromValue(String value) {
+        for (Motor motor : Motor.values()) {
+            if (motor.getDisplayName().equalsIgnoreCase(value)) {
+                return motor;
+            }
+        }
+        throw new IllegalArgumentException("Valor inválido para el enum Motor: " + value);
+    }
 }

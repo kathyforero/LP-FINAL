@@ -23,4 +23,14 @@ public enum Transmision {
     public String getDisplayName() {
         return displayName;
     }
+
+    // Método fromValue
+    public static Transmision fromValue(String value) {
+        for (Transmision transmision : Transmision.values()) {
+            if (transmision.getDisplayName().equalsIgnoreCase(value)) {
+                return transmision;
+            }
+        }
+        throw new IllegalArgumentException("Valor inválido para el enum Transmision: " + value);
+    }
 }

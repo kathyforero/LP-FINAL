@@ -39,4 +39,14 @@ public enum Ubicacion {
     public String getDisplayName() {
         return displayName;
     }
+
+     // Método fromValue
+     public static Ubicacion fromValue(String value) {
+        for (Ubicacion ubicacion : Ubicacion.values()) {
+            if (ubicacion.getDisplayName().equalsIgnoreCase(value)) {
+                return ubicacion;
+            }
+        }
+        throw new IllegalArgumentException("Valor inválido para el enum Ubicacion: " + value);
+    }
 }

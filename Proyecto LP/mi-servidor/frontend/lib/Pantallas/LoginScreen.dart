@@ -86,12 +86,20 @@ class LoginScreen extends StatelessWidget {
                     SnackBarHelper.showSnackBar(context, 'La contraseña debe tener al menos 6 caracteres',Colors.red);
                     return;
                   }
+                  ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text("Por favor espere"),
+                        backgroundColor: Colors.blue,
+                        duration: Duration(seconds: 2),
+                      ),
+                    );
                   try {
                     final capturedContext = context;
                     final autenticado = await ApiServicio.autenticarUsuario(email, password);
                     
                     if (autenticado) {
                       Usuario.instancia.establecerUsuario(id:email);
+                      SnackBarHelper.showSnackBar(capturedContext, '¡Sesión iniciada!', Colors.green);
                       Navigator.push(
                         capturedContext,
                         MaterialPageRoute(builder: (context) => MainScreen()),

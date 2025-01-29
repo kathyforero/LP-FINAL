@@ -1,9 +1,13 @@
-import 'dart:convert';
 import 'dart:typed_data';
-import 'package:http/http.dart' as http;
+import 'package:frontend/Widgets/SnackBarHelper.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
-
+import '../Enums/Estado.dart';
+import "../Enums/MarcaDeAuto.dart";
+import '../Enums/Tipo.dart';
+import "../Enums/Motor.dart";
+import '../Enums/Transmision.dart';
+import "../Enums/Ubicacion.dart";
 import '../Configuraciones/Usuario.dart';
 import '../Configuraciones/ApiServicio.dart';
 import '../Configuraciones/FirebaseStorageService.dart';
@@ -210,16 +214,16 @@ class _CrearAutoScreenState extends State<CrearAutoScreen> {
     // Capturar valores desde los controladores y Dropdown
     String placa = placaController.text.trim();
     double? precio = double.tryParse(precioController.text.trim());
-    String? marca = marcaSeleccionada;
+    String? marca = MarcaDeAutoEnum.fromDisplayName(marcaSeleccionada)?.displayName;
     String? modelo = modeloSeleccionado;
-    String? tipo = tipoSeleccionado;
+    String? tipo = Tipo.getBackendValue(tipoSeleccionado);
     int? anio = int.tryParse(anioController.text.trim());
     int? kilometraje = int.tryParse(kilometrajeController.text.trim());
-    String? motor = motorSeleccionado;
-    String? transmision = transmisionSeleccionada;
+    String? motor = Motor.getBackendValue(motorSeleccionado);
+    String? transmision = Transmision.getBackendValue(transmisionSeleccionada);
     double? peso = double.tryParse(pesoController.text.trim());
-    String? ubicacion = ubicacionSeleccionada;
-    String? estado = estadoSeleccionado;
+    String? ubicacion = Ubicacion.getBackendValue(ubicacionSeleccionada);
+    String? estado = EstadoEnum.getBackendValue(estadoSeleccionado);
     String? usuario = Usuario.instancia.getCorreo;
 
     if (placa.isEmpty ||
@@ -234,9 +238,7 @@ class _CrearAutoScreenState extends State<CrearAutoScreen> {
         peso == null ||
         ubicacion == null ||
         estado == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Por favor completa todos los campos.')),
-      );
+          SnackBarHelper.showSnackBar(context, 'Por favor completa todos los campos.', Colors.blueGrey);
       return;
     }
 
@@ -258,29 +260,12 @@ class _CrearAutoScreenState extends State<CrearAutoScreen> {
       'fotos': urls,
     };
 
-    try {
-      // Aquí puedes realizar el envío del auto al backend
-      // Ejemplo usando HTTP
-      final response = await http.post(
-        Uri.parse('http://localhost:8080/api/autos'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode(autoData),
-      );
+   bool exito = await ApiServicio.crearAuto(autoData);
 
-      if (response.statusCode == 200) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Auto guardado exitosamente.')),
-        );
-      } else {
-        print(response.statusCode);
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Error al guardar el auto.')),
-        );
-      }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: $e')),
-      );
+    if (exito) {
+      SnackBarHelper.showSnackBar(context, 'Auto guardado exitosamente.', Colors.green);
+    } else {
+      SnackBarHelper.showSnackBar(context, 'Error al guardar el auto.', Colors.red);
     }
   }
 

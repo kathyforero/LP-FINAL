@@ -22,4 +22,12 @@ public enum Tipo {
         return displayName;
     }
 
+    public static Tipo fromValue(String value) {
+        for (Tipo tipo : Tipo.values()) {
+            if (tipo.getDisplayName().equalsIgnoreCase(value)) {
+                return tipo;
+            }
+        }
+        throw new IllegalArgumentException("Valor inválido para el enum Tipo: " + value);
+    }
 }
