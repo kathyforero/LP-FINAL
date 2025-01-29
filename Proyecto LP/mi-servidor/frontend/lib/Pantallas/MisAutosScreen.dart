@@ -3,6 +3,7 @@ import '../Configuraciones/Usuario.dart';
 import '../Configuraciones/ApiServicio.dart';
 import "../Enums/Ubicacion.dart";
 import "../Enums/MarcaDeAuto.dart";
+import 'EditarAutoScreen.dart';
 
 // Pantalla Mis Autos
 class MisAutosScreen extends StatelessWidget {
@@ -55,7 +56,7 @@ class MisAutosScreen extends StatelessWidget {
           // Vehicle grid
           Expanded(
             child: FutureBuilder<List<Map<String, dynamic>>?>(
-                  future: ApiServicio.obtenerTodosLosAutos(),
+                  future: ApiServicio.obtenerAutosPorUsuario(Usuario.instancia.getCorreo!),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return const Center(child: CircularProgressIndicator());
@@ -66,7 +67,7 @@ class MisAutosScreen extends StatelessWidget {
 
                     final autos = snapshot.data!;
 
-                    if (autos.length > 0) {
+                    if (autos.isNotEmpty) {
                       return Expanded(
                         child: LayoutBuilder(
                           builder: (context, constraints) {
@@ -96,7 +97,7 @@ class MisAutosScreen extends StatelessWidget {
                                           context,
                                           MaterialPageRoute(
                                             builder: (context) =>
-                                                VistaAutoScreen(auto: auto),
+                                                EditarAutoScreen(auto: auto),
                                           ),
                                         );
                                       },
