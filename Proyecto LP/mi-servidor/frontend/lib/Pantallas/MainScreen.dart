@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/Widgets/SnackBarHelper.dart';
 import '../Configuraciones/Usuario.dart';
 import 'CrearAutoScreen.dart';
 import 'VistaAutoScreen.dart';
@@ -21,6 +22,7 @@ class _MainScreenState extends State<MainScreen> {
   String? _marcaSeleccionada;
   String? _modeloSeleccionado;
   String? _tipoSeleccionado;
+  
 
   final TextEditingController _controladorKmDesde = TextEditingController();
   final TextEditingController _controladorKmHasta = TextEditingController();
@@ -29,7 +31,8 @@ class _MainScreenState extends State<MainScreen> {
 
   bool isLoading = true; // Bandera para verificar si está cargando
   String? nombreUsuario;
-
+  String? _criterioOrdenamiento; // Variable para almacenar el criterio seleccionado
+  bool? _ordenAscendente;
   List<String>? marcas;
   Map<String, List<String>> modelosPorMarca = {};
   List<String>? tipos;
@@ -49,6 +52,21 @@ class _MainScreenState extends State<MainScreen> {
     cargarAutos();
   }
 
+  void ordenarAutos() {
+    if (_autos == null || _autos!.isEmpty) return; // Si no hay autos, no hace nada
+
+    setState(() {
+      if (_criterioOrdenamiento == 'criterio1') {
+        _autos?.sort((a, b) => (a['precio'] as num).compareTo(b['precio'] as num)); // Ordenar por precio (ascendente)
+      } else if (_criterioOrdenamiento == 'criterio2') {
+        _autos?.sort((a, b) => (a['kilometraje'] as num).compareTo(b['kilometraje'] as num)); // Ordenar por kilometraje (ascendente)
+      }
+
+      if (_ordenAscendente != null && !_ordenAscendente!) {
+      _autos = _autos?.reversed.toList();
+    }
+    });
+  }
   Future<void> buscarAutosConFiltros() async {
     setState(() {
       _cargandoAutos = true;
@@ -457,20 +475,17 @@ class _MainScreenState extends State<MainScreen> {
                       child: GestureDetector(
                         onTap: () {
                           setState(() {
-                            setState(() {
-                              _marcaSeleccionada =
-                                  null; // Restablecer marca seleccionada
-                              _modeloSeleccionado = null;
-                              _tipoSeleccionado =
-                                  null; // Restablecer modelo seleccionado
-                              _controladorKmDesde.clear();
-                              _controladorKmHasta.clear();
-                              _controladorPrecioDesde.clear();
-                              _controladorPrecioHasta
-                                  .clear(); // Limpiar el TextFormField
-                              cargarAutos();
-                            });
+                            _marcaSeleccionada = null; // Restablecer marca seleccionada
+                            _modeloSeleccionado = null;
+                            _tipoSeleccionado = null; // Restablecer modelo seleccionado
+                            _controladorKmDesde.clear();
+                            _controladorKmHasta.clear();
+                            _controladorPrecioDesde.clear();
+                            _controladorPrecioHasta.clear(); // Limpiar el TextFormField
+                            _criterioOrdenamiento = null; // Reiniciar criterio de ordenamiento
+                            _ordenAscendente = null; 
                           });
+                          cargarAutos();
                         },
                         child: const SizedBox(
                           width: 45, // Ancho de la imagen
@@ -520,6 +535,7 @@ class _MainScreenState extends State<MainScreen> {
                             style: const TextStyle(
                                 color: Colors
                                     .white), // Color del texto seleccionado
+                            value: _criterioOrdenamiento,
                             items: const [
                               DropdownMenuItem(
                                 value: 'criterio1',
@@ -533,13 +549,65 @@ class _MainScreenState extends State<MainScreen> {
                                     style: TextStyle(color: Colors.white)),
                               ),
                             ],
-                            onChanged: (value) {},
+                            onChanged: (value) {
+                              _criterioOrdenamiento = value; //actualiza el criterio de ordenamiento
+                            },
                           ),
                         ),
                       ),
                       const SizedBox(width: 10),
+                      // Selección de orden ascendente/descendente
+                        Flexible(
+                          child: SizedBox(
+                            width: 150,
+                            child: DropdownButtonFormField<bool>(
+                              decoration: const InputDecoration(
+                                labelText: 'Orden:',
+                                labelStyle: TextStyle(color: Colors.white),
+                                enabledBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(color: Colors.white),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(color: Colors.purple),
+                                ),
+                              ),
+                              dropdownColor: const Color(0xFF2B193E),
+                              style: const TextStyle(color: Colors.white),
+                              value: _ordenAscendente,
+                              items: const [
+                                DropdownMenuItem(
+                                  value: true,
+                                  child: Text('Ascendente', style: TextStyle(color: Colors.white)),
+                                ),
+                                DropdownMenuItem(
+                                  value: false,
+                                  child: Text('Descendente', style: TextStyle(color: Colors.white)),
+                                ),
+                              ],
+                              onChanged: (value) {
+                                setState(() {
+                                  _ordenAscendente = value;
+                                });
+                              },
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+
+                      const SizedBox(width: 10),
                       ElevatedButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          if (_criterioOrdenamiento != null && _ordenAscendente != null) {
+                            ordenarAutos(); // 🔹 Llama al método de ordenamiento
+                          }else{
+                            SnackBarHelper.showSnackBar(context, "Debes seleccionar un criterio y un orden", Colors.grey);
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF9576DA), // Fondo del botón
+                          foregroundColor: Colors.white, // Color del texto
+                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                        ),
                         child: const Text('Aplicar'),
                       ),
                     ],
