@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:typed_data';
+import 'package:frontend/Pantallas/MisAutosScreen.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
@@ -7,16 +8,30 @@ import 'package:file_picker/file_picker.dart';
 import '../Configuraciones/Usuario.dart';
 import '../Configuraciones/ApiServicio.dart';
 import '../Configuraciones/FirebaseStorageService.dart';
+import '../Configuraciones/VerificacionesHelper.dart';
+import 'package:frontend/Widgets/SnackBarHelper.dart';
 
-// Crear Autos
+import '../Enums/Estado.dart';
+import "../Enums/MarcaDeAuto.dart";
+import '../Enums/Tipo.dart';
+import "../Enums/Motor.dart";
+import '../Enums/Transmision.dart';
+import "../Enums/Ubicacion.dart";
+
+// Editar Autos
 class EditarAutoScreen extends StatefulWidget {
-  const EditarAutoScreen({super.key});
+  final Map<String, dynamic> auto;
+
+  const EditarAutoScreen({Key? key, required this.auto}) : super(key: key);
 
   @override
   State<EditarAutoScreen> createState() => _EditarAutoScreenState();
 }
 
 class _EditarAutoScreenState extends State<EditarAutoScreen> {
+  late Map<String, dynamic> auto;
+  late List<String> _fotosSeleccionadas1;
+
   final TextEditingController placaController = TextEditingController();
   final TextEditingController precioController = TextEditingController();
   final TextEditingController anioController = TextEditingController();
@@ -41,7 +56,7 @@ class _EditarAutoScreenState extends State<EditarAutoScreen> {
   List<String>? transmision;
   List<String>? ubicacion;
   List<String>? estados;
-  
+
   bool isCargandoMarcas = true;
   bool isCargandoModelos = false;
   bool isCargandoTipos = true;
@@ -53,41 +68,57 @@ class _EditarAutoScreenState extends State<EditarAutoScreen> {
   @override
   void initState() {
     super.initState();
+    // Inicializar auto correctamente
+    auto = widget.auto;
     cargarMarcas();
     cargarTipos();
     cargarMotor();
     cargarTransmision();
     cargarUbicacion();
     cargarEstados();
+    placaController.text = auto['placa'] ?? '';
+    precioController.text = auto['precio']?.toString() ?? '';
+    anioController.text = auto['anio']?.toString() ?? '';
+    kilometrajeController.text = auto['kilometraje']?.toString() ?? '';
+    pesoController.text = auto['peso']?.toString() ?? '';
+
+    marcaSeleccionada = auto['marca'];
+    modeloSeleccionado = auto['modelo'];
+    tipoSeleccionado = auto['tipo'];
+    motorSeleccionado = auto['motor'];
+    transmisionSeleccionada = auto['transmision'];
+    ubicacionSeleccionada = auto['ubicacion'];
+    estadoSeleccionado = auto['estado'];
   }
 
   Future<void> cargarMarcas() async {
-  try {
-    final listaMarcas = await ApiServicio.obtenerMarcas();
-    setState(() {
-      marcas = listaMarcas;
-      isCargandoMarcas = false;
-    });
-  } catch (e) {
-    print('Error al cargar marcas: $e');
-    setState(() => isCargandoMarcas = false);
+    try {
+      final listaMarcas = await ApiServicio.obtenerMarcas();
+      setState(() {
+        marcas = listaMarcas;
+        isCargandoMarcas = false;
+      });
+    } catch (e) {
+      print('Error al cargar marcas: $e');
+      setState(() => isCargandoMarcas = false);
+    }
   }
-}
 
   Future<void> cargarModelos(String marca) async {
-  if (modelosPorMarca.containsKey(marca)) return; // Si ya existen, no volver a cargar
-  setState(() => isCargandoModelos = true);
-  try {
-    final listaModelos = await ApiServicio.obtenerModelos(marca);
-    setState(() {
-      modelosPorMarca[marca] = listaModelos;
-      isCargandoModelos = false;
-    });
-  } catch (e) {
-    print('Error al cargar modelos para $marca: $e');
-    setState(() => isCargandoModelos = false);
+    if (modelosPorMarca.containsKey(marca))
+      return; // Si ya existen, no volver a cargar
+    setState(() => isCargandoModelos = true);
+    try {
+      final listaModelos = await ApiServicio.obtenerModelos(marca);
+      setState(() {
+        modelosPorMarca[marca] = listaModelos;
+        isCargandoModelos = false;
+      });
+    } catch (e) {
+      print('Error al cargar modelos para $marca: $e');
+      setState(() => isCargandoModelos = false);
+    }
   }
-}
 
   Future<void> cargarTipos() async {
     setState(() => isCargandoTipos = true);
@@ -188,7 +219,80 @@ class _EditarAutoScreenState extends State<EditarAutoScreen> {
     });
   }
 
+  void eliminarImagenActual() {
+    setState(() {
+      if (_fotosSeleccionadas.isNotEmpty) {
+        _fotosSeleccionadas.removeAt(indiceActual);
+
+        // Ajustar el índice si es necesario
+        if (indiceActual >= _fotosSeleccionadas.length && indiceActual > 0) {
+          indiceActual--;
+        }
+      } else {
+        SnackBarHelper.showSnackBar(
+            context, "¡No hay imagenes que borrar!", Colors.grey);
+      }
+    });
+  }
+
+  bool validarYVerificar(BuildContext context, String placa, String precioTxt,
+      String anioTxt, String kilometrajeTxt, String pesoTxt) {
+    double? precio = double.tryParse(precioTxt);
+    int? anio = int.tryParse(anioTxt);
+    int? kilometraje = int.tryParse(kilometrajeTxt);
+    double? peso = double.tryParse(pesoTxt);
+
+    if (precio == null || anio == null || kilometraje == null || peso == null) {
+      SnackBarHelper.showSnackBar(context,
+          "Todos los valores numéricos deben ser números válidos.", Colors.red);
+    }
+
+    bool datosValidos = VerificacionesHelper.verificarDatos(
+        context, placa, precio, anio, kilometraje, peso);
+    if (datosValidos) {
+      print("✅ Datos válidos, proceder con el proceso.");
+      return true;
+    }
+
+    return false;
+  }
+
   Future<void> guardarAuto() async {
+    // Capturar valores desde los controladores y Dropdown
+    String placa = placaController.text.trim();
+    double? precio = double.tryParse(precioController.text.trim());
+    String? marca = MarcaDeAutoEnum.getBackendValue(marcaSeleccionada);
+    String? modelo = modeloSeleccionado;
+    String? tipo = Tipo.getBackendValue(tipoSeleccionado);
+    int? anio = int.tryParse(anioController.text.trim());
+    int? kilometraje = int.tryParse(kilometrajeController.text.trim());
+    String? motor = Motor.getBackendValue(motorSeleccionado);
+    String? transmision = Transmision.getBackendValue(transmisionSeleccionada);
+    double? peso = double.tryParse(pesoController.text.trim());
+    String? ubicacion = Ubicacion.getBackendValue(ubicacionSeleccionada);
+    String? estado = EstadoEnum.getBackendValue(estadoSeleccionado);
+    String? usuario = Usuario.instancia.getCorreo;
+
+    if (marca == null ||
+        modelo == null ||
+        tipo == null ||
+        motor == null ||
+        transmision == null ||
+        ubicacion == null ||
+        estado == null) {
+      SnackBarHelper.showSnackBar(
+          context, 'Por favor completa todos los campos.', Colors.blueGrey);
+      return;
+    }
+
+    if (estado.toLowerCase() == 'nuevo' && kilometraje! > 1000) {
+      SnackBarHelper.showSnackBar(
+          context,
+          'El kilometraje no puede ser mayor 1000 si el auto es nuevo!',
+          Colors.red);
+      return;
+    }
+
     if (_fotosSeleccionadas.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -197,46 +301,20 @@ class _EditarAutoScreenState extends State<EditarAutoScreen> {
       return;
     }
 
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text("Por favor espere"),
+        backgroundColor: Colors.blue,
+        duration: Duration(seconds: 4),
+      ),
+    );
+
     FirebaseStorageService storageService = FirebaseStorageService();
     List<String> urls = await storageService.subirFotos(_fotosSeleccionadas);
 
     if (urls.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Error al subir imágenes.')),
-      );
-      return;
-    }
-
-    // Capturar valores desde los controladores y Dropdown
-    String placa = placaController.text.trim();
-    double? precio = double.tryParse(precioController.text.trim());
-    String? marca = marcaSeleccionada;
-    String? modelo = modeloSeleccionado;
-    String? tipo = tipoSeleccionado;
-    int? anio = int.tryParse(anioController.text.trim());
-    int? kilometraje = int.tryParse(kilometrajeController.text.trim());
-    String? motor = motorSeleccionado;
-    String? transmision = transmisionSeleccionada;
-    double? peso = double.tryParse(pesoController.text.trim());
-    String? ubicacion = ubicacionSeleccionada;
-    String? estado = estadoSeleccionado;
-    String? usuario = Usuario.instancia.getCorreo;
-
-    if (placa.isEmpty ||
-        precio == null ||
-        marca == null ||
-        modelo == null ||
-        tipo == null ||
-        anio == null ||
-        kilometraje == null ||
-        motor == null ||
-        transmision == null ||
-        peso == null ||
-        ubicacion == null ||
-        estado == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Por favor completa todos los campos.')),
-      );
+      SnackBarHelper.showSnackBar(
+          context, 'Error al subir imágenes.', Colors.red);
       return;
     }
 
@@ -258,29 +336,18 @@ class _EditarAutoScreenState extends State<EditarAutoScreen> {
       'fotos': urls,
     };
 
-    try {
-      // Aquí puedes realizar el envío del auto al backend
-      // Ejemplo usando HTTP
-      final response = await http.post(
-        Uri.parse('http://localhost:8080/api/autos'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode(autoData),
-      );
+    bool exito = await ApiServicio.crearAuto(autoData);
 
-      if (response.statusCode == 200) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Auto guardado exitosamente.')),
-        );
-      } else {
-        print(response.statusCode);
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Error al guardar el auto.')),
-        );
-      }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: $e')),
+    if (exito) {
+      SnackBarHelper.showSnackBar(
+          context, 'Auto guardado exitosamente.', Colors.green);
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => MisAutosScreen()),
       );
+    } else {
+      SnackBarHelper.showSnackBar(
+          context, 'Error al guardar el auto.', Colors.red);
     }
   }
 
@@ -307,7 +374,7 @@ class _EditarAutoScreenState extends State<EditarAutoScreen> {
 
                 // Texto centrado
                 Text(
-                  'Bienvenido al creador de vehículos, ${Usuario.instancia.getNombre}!',
+                  'Bienvenido al editor de vehículos, ${Usuario.instancia.getNombre}!',
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 20,
@@ -343,19 +410,17 @@ class _EditarAutoScreenState extends State<EditarAutoScreen> {
                                     width: 45, // Ancho de la imagen
                                     height: 50, // Alto de la imagen
                                     child: MouseRegion(
-                                        cursor: SystemMouseCursors.click,
-                                        child: GestureDetector(
-                                          onTap: () {
-                                            print("Imagen presionada");
-                                            // Lógica al presionar el botón
-                                          },
-                                          child: Image(
-                                            image: NetworkImage(
-                                                'https://i.postimg.cc/y6gjPyff/Trash.png'),
-                                            fit: BoxFit
-                                                .contain, // Asegura que la imagen cubra el área
-                                          ),
-                                        )),
+                                      cursor: SystemMouseCursors.click,
+                                      child: GestureDetector(
+                                        onTap:
+                                            eliminarImagenActual, // Llama al método modular
+                                        child: Image.network(
+                                          'https://i.postimg.cc/y6gjPyff/Trash.png',
+                                          fit: BoxFit
+                                              .contain, // Ajusta la imagen dentro del área
+                                        ),
+                                      ),
+                                    ),
                                   ),
 
                                   SizedBox(width: 50),
@@ -551,40 +616,57 @@ class _EditarAutoScreenState extends State<EditarAutoScreen> {
                                           ),
                                           const SizedBox(width: 40),
                                           isCargandoMarcas
-                                          ? const CircularProgressIndicator()
-                                          : SizedBox(
-                                              width: 550,
-                                              child: DropdownButtonFormField<String>(
-                                                value: marcaSeleccionada,
-                                                items: marcas?.map((marca) {
-                                                  return DropdownMenuItem(
-                                                    value: marca,
-                                                    child: Text(
-                                                      marca,
-                                                      style: TextStyle(color: Colors.white), // Pone el texto en blanco
+                                              ? const CircularProgressIndicator()
+                                              : SizedBox(
+                                                  width: 550,
+                                                  child:
+                                                      DropdownButtonFormField<
+                                                          String>(
+                                                    value: marcaSeleccionada,
+                                                    items: marcas?.map((marca) {
+                                                      return DropdownMenuItem(
+                                                        value: marca,
+                                                        child: Text(
+                                                          marca,
+                                                          style: TextStyle(
+                                                              color: Colors
+                                                                  .white), // Pone el texto en blanco
+                                                        ),
+                                                      );
+                                                    }).toList(),
+                                                    onChanged: (value) {
+                                                      setState(() {
+                                                        marcaSeleccionada =
+                                                            value;
+                                                        cargarModelos(value!);
+                                                      });
+                                                    },
+                                                    decoration:
+                                                        const InputDecoration(
+                                                      labelText: "Marca",
+                                                      labelStyle: TextStyle(
+                                                          color: Colors
+                                                              .white), // Color de la etiqueta
+                                                      enabledBorder:
+                                                          OutlineInputBorder(
+                                                        borderSide: BorderSide(
+                                                            color: Colors
+                                                                .white), // Borde blanco
+                                                      ),
+                                                      focusedBorder:
+                                                          OutlineInputBorder(
+                                                        borderSide: BorderSide(
+                                                            color: Colors
+                                                                .purple), // Borde al seleccionar
+                                                      ),
                                                     ),
-                                                  );
-                                                }).toList(),
-                                                onChanged: (value) {
-                                                  setState(() {
-                                                    marcaSeleccionada = value;
-                                                    cargarModelos(value!);
-                                                  });
-                                                },
-                                                decoration: const InputDecoration(
-                                                  labelText: "Marca",
-                                                  labelStyle: TextStyle(color: Colors.white), // Color de la etiqueta
-                                                  enabledBorder: OutlineInputBorder(
-                                                    borderSide: BorderSide(color: Colors.white), // Borde blanco
-                                                  ),
-                                                  focusedBorder: OutlineInputBorder(
-                                                    borderSide: BorderSide(color: Colors.purple), // Borde al seleccionar
+                                                    style: TextStyle(
+                                                        color: Colors
+                                                            .white), // Color del texto seleccionado
+                                                    dropdownColor: const Color(
+                                                        0xFF2B193E), // Fondo del desplegable
                                                   ),
                                                 ),
-                                                style: TextStyle(color: Colors.white), // Color del texto seleccionado
-                                                dropdownColor: const Color(0xFF2B193E), // Fondo del desplegable
-                                              ),
-                                            ),
                                         ]),
                                     const SizedBox(height: 10),
 
@@ -603,41 +685,64 @@ class _EditarAutoScreenState extends State<EditarAutoScreen> {
                                             ),
                                             const SizedBox(width: 40),
                                             isCargandoModelos
-                                            ? const CircularProgressIndicator()
-                                            : SizedBox(
-                                                width: 550,
-                                                child: DropdownButtonFormField<String>(
-                                                  value: modeloSeleccionado,
-                                                  items: (marcaSeleccionada != null && modelosPorMarca.containsKey(marcaSeleccionada))
-                                                      ? modelosPorMarca[marcaSeleccionada]!.map((modelo) {
-                                                          return DropdownMenuItem(
-                                                            value: modelo,
-                                                            child: Text(
-                                                              modelo,
-                                                              style: TextStyle(color: Colors.white), // Texto blanco
-                                                            ),
-                                                          );
-                                                        }).toList()
-                                                      : [],
-                                                  onChanged: (value) {
-                                                    setState(() {
-                                                      modeloSeleccionado = value;
-                                                    });
-                                                  },
-                                                  decoration: const InputDecoration(
-                                                    labelText: "Modelo",
-                                                    labelStyle: TextStyle(color: Colors.white), // Etiqueta blanca
-                                                    enabledBorder: OutlineInputBorder(
-                                                      borderSide: BorderSide(color: Colors.white), // Borde blanco
-                                                    ),
-                                                    focusedBorder: OutlineInputBorder(
-                                                      borderSide: BorderSide(color: Colors.purple), // Borde al seleccionar
+                                                ? const CircularProgressIndicator()
+                                                : SizedBox(
+                                                    width: 550,
+                                                    child:
+                                                        DropdownButtonFormField<
+                                                            String>(
+                                                      value: modeloSeleccionado,
+                                                      items: (marcaSeleccionada !=
+                                                                  null &&
+                                                              modelosPorMarca
+                                                                  .containsKey(
+                                                                      marcaSeleccionada))
+                                                          ? modelosPorMarca[
+                                                                  marcaSeleccionada]!
+                                                              .map((modelo) {
+                                                              return DropdownMenuItem(
+                                                                value: modelo,
+                                                                child: Text(
+                                                                  modelo,
+                                                                  style: TextStyle(
+                                                                      color: Colors
+                                                                          .white), // Texto blanco
+                                                                ),
+                                                              );
+                                                            }).toList()
+                                                          : [],
+                                                      onChanged: (value) {
+                                                        setState(() {
+                                                          modeloSeleccionado =
+                                                              value;
+                                                        });
+                                                      },
+                                                      decoration:
+                                                          const InputDecoration(
+                                                        labelText: "Modelo",
+                                                        labelStyle: TextStyle(
+                                                            color: Colors
+                                                                .white), // Etiqueta blanca
+                                                        enabledBorder:
+                                                            OutlineInputBorder(
+                                                          borderSide: BorderSide(
+                                                              color: Colors
+                                                                  .white), // Borde blanco
+                                                        ),
+                                                        focusedBorder:
+                                                            OutlineInputBorder(
+                                                          borderSide: BorderSide(
+                                                              color: Colors
+                                                                  .purple), // Borde al seleccionar
+                                                        ),
+                                                      ),
+                                                      style: TextStyle(
+                                                          color: Colors
+                                                              .white), // Texto en blanco
+                                                      dropdownColor: const Color(
+                                                          0xFF2B193E), // Fondo del desplegable
                                                     ),
                                                   ),
-                                                  style: TextStyle(color: Colors.white), // Texto en blanco
-                                                  dropdownColor: const Color(0xFF2B193E), // Fondo del desplegable
-                                                ),
-                                              ),
                                           ]),
                                     const SizedBox(height: 10),
 
@@ -655,39 +760,56 @@ class _EditarAutoScreenState extends State<EditarAutoScreen> {
                                           ),
                                           const SizedBox(width: 40),
                                           isCargandoTipos
-                                          ? const CircularProgressIndicator()
-                                          : SizedBox(
-                                              width: 550,
-                                              child: DropdownButtonFormField<String>(
-                                                value: tipoSeleccionado,
-                                                items: tipos?.map((tipo) {
-                                                  return DropdownMenuItem(
-                                                    value: tipo,
-                                                    child: Text(
-                                                      tipo,
-                                                      style: TextStyle(color: Colors.white), // Texto blanco
+                                              ? const CircularProgressIndicator()
+                                              : SizedBox(
+                                                  width: 550,
+                                                  child:
+                                                      DropdownButtonFormField<
+                                                          String>(
+                                                    value: tipoSeleccionado,
+                                                    items: tipos?.map((tipo) {
+                                                      return DropdownMenuItem(
+                                                        value: tipo,
+                                                        child: Text(
+                                                          tipo,
+                                                          style: TextStyle(
+                                                              color: Colors
+                                                                  .white), // Texto blanco
+                                                        ),
+                                                      );
+                                                    }).toList(),
+                                                    onChanged: (value) {
+                                                      setState(() {
+                                                        tipoSeleccionado =
+                                                            value;
+                                                      });
+                                                    },
+                                                    decoration:
+                                                        const InputDecoration(
+                                                      labelText: "Tipo",
+                                                      labelStyle: TextStyle(
+                                                          color: Colors
+                                                              .white), // Etiqueta blanca
+                                                      enabledBorder:
+                                                          OutlineInputBorder(
+                                                        borderSide: BorderSide(
+                                                            color: Colors
+                                                                .white), // Borde blanco
+                                                      ),
+                                                      focusedBorder:
+                                                          OutlineInputBorder(
+                                                        borderSide: BorderSide(
+                                                            color: Colors
+                                                                .purple), // Borde al seleccionar
+                                                      ),
                                                     ),
-                                                  );
-                                                }).toList(),
-                                                onChanged: (value) {
-                                                  setState(() {
-                                                    tipoSeleccionado = value;
-                                                  });
-                                                },
-                                                decoration: const InputDecoration(
-                                                  labelText: "Tipo",
-                                                  labelStyle: TextStyle(color: Colors.white), // Etiqueta blanca
-                                                  enabledBorder: OutlineInputBorder(
-                                                    borderSide: BorderSide(color: Colors.white), // Borde blanco
-                                                  ),
-                                                  focusedBorder: OutlineInputBorder(
-                                                    borderSide: BorderSide(color: Colors.purple), // Borde al seleccionar
+                                                    style: TextStyle(
+                                                        color: Colors
+                                                            .white), // Texto en blanco
+                                                    dropdownColor: const Color(
+                                                        0xFF2B193E), // Fondo del desplegable
                                                   ),
                                                 ),
-                                                style: TextStyle(color: Colors.white), // Texto en blanco
-                                                dropdownColor: const Color(0xFF2B193E), // Fondo del desplegable
-                                              ),
-                                            ),
                                         ]),
                                     const SizedBox(height: 10),
 
@@ -765,39 +887,56 @@ class _EditarAutoScreenState extends State<EditarAutoScreen> {
                                           ),
                                           const SizedBox(width: 40),
                                           isCargandoMotor
-                                          ? const CircularProgressIndicator()
-                                          : SizedBox(
-                                              width: 550,
-                                              child: DropdownButtonFormField<String>(
-                                                value: motorSeleccionado,
-                                                items: motor?.map((m) {
-                                                  return DropdownMenuItem(
-                                                    value: m,
-                                                    child: Text(
-                                                      m,
-                                                      style: TextStyle(color: Colors.white), // Texto blanco
+                                              ? const CircularProgressIndicator()
+                                              : SizedBox(
+                                                  width: 550,
+                                                  child:
+                                                      DropdownButtonFormField<
+                                                          String>(
+                                                    value: motorSeleccionado,
+                                                    items: motor?.map((m) {
+                                                      return DropdownMenuItem(
+                                                        value: m,
+                                                        child: Text(
+                                                          m,
+                                                          style: TextStyle(
+                                                              color: Colors
+                                                                  .white), // Texto blanco
+                                                        ),
+                                                      );
+                                                    }).toList(),
+                                                    onChanged: (value) {
+                                                      setState(() {
+                                                        motorSeleccionado =
+                                                            value;
+                                                      });
+                                                    },
+                                                    decoration:
+                                                        const InputDecoration(
+                                                      labelText: "Motor",
+                                                      labelStyle: TextStyle(
+                                                          color: Colors
+                                                              .white), // Etiqueta blanca
+                                                      enabledBorder:
+                                                          OutlineInputBorder(
+                                                        borderSide: BorderSide(
+                                                            color: Colors
+                                                                .white), // Borde blanco
+                                                      ),
+                                                      focusedBorder:
+                                                          OutlineInputBorder(
+                                                        borderSide: BorderSide(
+                                                            color: Colors
+                                                                .purple), // Borde al seleccionar
+                                                      ),
                                                     ),
-                                                  );
-                                                }).toList(),
-                                                onChanged: (value) {
-                                                  setState(() {
-                                                    motorSeleccionado = value;
-                                                  });
-                                                },
-                                                decoration: const InputDecoration(
-                                                  labelText: "Motor",
-                                                  labelStyle: TextStyle(color: Colors.white), // Etiqueta blanca
-                                                  enabledBorder: OutlineInputBorder(
-                                                    borderSide: BorderSide(color: Colors.white), // Borde blanco
-                                                  ),
-                                                  focusedBorder: OutlineInputBorder(
-                                                    borderSide: BorderSide(color: Colors.purple), // Borde al seleccionar
+                                                    style: TextStyle(
+                                                        color: Colors
+                                                            .white), // Texto en blanco
+                                                    dropdownColor: const Color(
+                                                        0xFF2B193E), // Fondo del desplegable
                                                   ),
                                                 ),
-                                                style: TextStyle(color: Colors.white), // Texto en blanco
-                                                dropdownColor: const Color(0xFF2B193E), // Fondo del desplegable
-                                              ),
-                                            ),
                                         ]),
                                     const SizedBox(height: 10),
 
@@ -815,39 +954,58 @@ class _EditarAutoScreenState extends State<EditarAutoScreen> {
                                           ),
                                           const SizedBox(width: 40),
                                           isCargandoTransmision
-                                          ? const CircularProgressIndicator()
-                                          : SizedBox(
-                                              width: 550,
-                                              child: DropdownButtonFormField<String>(
-                                                value: transmisionSeleccionada,
-                                                items: transmision?.map((t) {
-                                                  return DropdownMenuItem(
-                                                    value: t,
-                                                    child: Text(
-                                                      t,
-                                                      style: TextStyle(color: Colors.white), // Texto blanco
+                                              ? const CircularProgressIndicator()
+                                              : SizedBox(
+                                                  width: 550,
+                                                  child:
+                                                      DropdownButtonFormField<
+                                                          String>(
+                                                    value:
+                                                        transmisionSeleccionada,
+                                                    items:
+                                                        transmision?.map((t) {
+                                                      return DropdownMenuItem(
+                                                        value: t,
+                                                        child: Text(
+                                                          t,
+                                                          style: TextStyle(
+                                                              color: Colors
+                                                                  .white), // Texto blanco
+                                                        ),
+                                                      );
+                                                    }).toList(),
+                                                    onChanged: (value) {
+                                                      setState(() {
+                                                        transmisionSeleccionada =
+                                                            value;
+                                                      });
+                                                    },
+                                                    decoration:
+                                                        const InputDecoration(
+                                                      labelText: "Transmisión",
+                                                      labelStyle: TextStyle(
+                                                          color: Colors
+                                                              .white), // Etiqueta blanca
+                                                      enabledBorder:
+                                                          OutlineInputBorder(
+                                                        borderSide: BorderSide(
+                                                            color: Colors
+                                                                .white), // Borde blanco
+                                                      ),
+                                                      focusedBorder:
+                                                          OutlineInputBorder(
+                                                        borderSide: BorderSide(
+                                                            color: Colors
+                                                                .purple), // Borde al seleccionar
+                                                      ),
                                                     ),
-                                                  );
-                                                }).toList(),
-                                                onChanged: (value) {
-                                                  setState(() {
-                                                    transmisionSeleccionada = value;
-                                                  });
-                                                },
-                                                decoration: const InputDecoration(
-                                                  labelText: "Transmisión",
-                                                  labelStyle: TextStyle(color: Colors.white), // Etiqueta blanca
-                                                  enabledBorder: OutlineInputBorder(
-                                                    borderSide: BorderSide(color: Colors.white), // Borde blanco
-                                                  ),
-                                                  focusedBorder: OutlineInputBorder(
-                                                    borderSide: BorderSide(color: Colors.purple), // Borde al seleccionar
+                                                    style: TextStyle(
+                                                        color: Colors
+                                                            .white), // Texto en blanco
+                                                    dropdownColor: const Color(
+                                                        0xFF2B193E), // Fondo del desplegable
                                                   ),
                                                 ),
-                                                style: TextStyle(color: Colors.white), // Texto en blanco
-                                                dropdownColor: const Color(0xFF2B193E), // Fondo del desplegable
-                                              ),
-                                            ),
                                         ]),
                                     const SizedBox(height: 10),
 
@@ -895,39 +1053,57 @@ class _EditarAutoScreenState extends State<EditarAutoScreen> {
                                           ),
                                           const SizedBox(width: 40),
                                           isCargandoUbicacion
-                                          ? const CircularProgressIndicator()
-                                          : SizedBox(
-                                              width: 550,
-                                              child: DropdownButtonFormField<String>(
-                                                value: ubicacionSeleccionada,
-                                                items: ubicacion?.map((u) {
-                                                  return DropdownMenuItem(
-                                                    value: u,
-                                                    child: Text(
-                                                      u,
-                                                      style: TextStyle(color: Colors.white), // Texto blanco
+                                              ? const CircularProgressIndicator()
+                                              : SizedBox(
+                                                  width: 550,
+                                                  child:
+                                                      DropdownButtonFormField<
+                                                          String>(
+                                                    value:
+                                                        ubicacionSeleccionada,
+                                                    items: ubicacion?.map((u) {
+                                                      return DropdownMenuItem(
+                                                        value: u,
+                                                        child: Text(
+                                                          u,
+                                                          style: TextStyle(
+                                                              color: Colors
+                                                                  .white), // Texto blanco
+                                                        ),
+                                                      );
+                                                    }).toList(),
+                                                    onChanged: (value) {
+                                                      setState(() {
+                                                        ubicacionSeleccionada =
+                                                            value;
+                                                      });
+                                                    },
+                                                    decoration:
+                                                        const InputDecoration(
+                                                      labelText: "Ubicación",
+                                                      labelStyle: TextStyle(
+                                                          color: Colors
+                                                              .white), // Etiqueta blanca
+                                                      enabledBorder:
+                                                          OutlineInputBorder(
+                                                        borderSide: BorderSide(
+                                                            color: Colors
+                                                                .white), // Borde blanco
+                                                      ),
+                                                      focusedBorder:
+                                                          OutlineInputBorder(
+                                                        borderSide: BorderSide(
+                                                            color: Colors
+                                                                .purple), // Borde al seleccionar
+                                                      ),
                                                     ),
-                                                  );
-                                                }).toList(),
-                                                onChanged: (value) {
-                                                  setState(() {
-                                                    ubicacionSeleccionada = value;
-                                                  });
-                                                },
-                                                decoration: const InputDecoration(
-                                                  labelText: "Ubicación",
-                                                  labelStyle: TextStyle(color: Colors.white), // Etiqueta blanca
-                                                  enabledBorder: OutlineInputBorder(
-                                                    borderSide: BorderSide(color: Colors.white), // Borde blanco
-                                                  ),
-                                                  focusedBorder: OutlineInputBorder(
-                                                    borderSide: BorderSide(color: Colors.purple), // Borde al seleccionar
+                                                    style: TextStyle(
+                                                        color: Colors
+                                                            .white), // Texto en blanco
+                                                    dropdownColor: const Color(
+                                                        0xFF2B193E), // Fondo del desplegable
                                                   ),
                                                 ),
-                                                style: TextStyle(color: Colors.white), // Texto en blanco
-                                                dropdownColor: const Color(0xFF2B193E), // Fondo del desplegable
-                                              ),
-                                            ),
                                         ]),
                                     const SizedBox(height: 10),
 
@@ -945,39 +1121,56 @@ class _EditarAutoScreenState extends State<EditarAutoScreen> {
                                           ),
                                           const SizedBox(width: 40),
                                           isCargandoEstados
-                                          ? const CircularProgressIndicator()
-                                          : SizedBox(
-                                              width: 550,
-                                              child: DropdownButtonFormField<String>(
-                                                value: estadoSeleccionado,
-                                                items: estados?.map((e) {
-                                                  return DropdownMenuItem(
-                                                    value: e,
-                                                    child: Text(
-                                                      e,
-                                                      style: TextStyle(color: Colors.white), // Texto blanco
+                                              ? const CircularProgressIndicator()
+                                              : SizedBox(
+                                                  width: 550,
+                                                  child:
+                                                      DropdownButtonFormField<
+                                                          String>(
+                                                    value: estadoSeleccionado,
+                                                    items: estados?.map((e) {
+                                                      return DropdownMenuItem(
+                                                        value: e,
+                                                        child: Text(
+                                                          e,
+                                                          style: TextStyle(
+                                                              color: Colors
+                                                                  .white), // Texto blanco
+                                                        ),
+                                                      );
+                                                    }).toList(),
+                                                    onChanged: (value) {
+                                                      setState(() {
+                                                        estadoSeleccionado =
+                                                            value;
+                                                      });
+                                                    },
+                                                    decoration:
+                                                        const InputDecoration(
+                                                      labelText: "Estado",
+                                                      labelStyle: TextStyle(
+                                                          color: Colors
+                                                              .white), // Etiqueta blanca
+                                                      enabledBorder:
+                                                          OutlineInputBorder(
+                                                        borderSide: BorderSide(
+                                                            color: Colors
+                                                                .white), // Borde blanco
+                                                      ),
+                                                      focusedBorder:
+                                                          OutlineInputBorder(
+                                                        borderSide: BorderSide(
+                                                            color: Colors
+                                                                .purple), // Borde al seleccionar
+                                                      ),
                                                     ),
-                                                  );
-                                                }).toList(),
-                                                onChanged: (value) {
-                                                  setState(() {
-                                                    estadoSeleccionado = value;
-                                                  });
-                                                },
-                                                decoration: const InputDecoration(
-                                                  labelText: "Estado",
-                                                  labelStyle: TextStyle(color: Colors.white), // Etiqueta blanca
-                                                  enabledBorder: OutlineInputBorder(
-                                                    borderSide: BorderSide(color: Colors.white), // Borde blanco
-                                                  ),
-                                                  focusedBorder: OutlineInputBorder(
-                                                    borderSide: BorderSide(color: Colors.purple), // Borde al seleccionar
+                                                    style: TextStyle(
+                                                        color: Colors
+                                                            .white), // Texto en blanco
+                                                    dropdownColor: const Color(
+                                                        0xFF2B193E), // Fondo del desplegable
                                                   ),
                                                 ),
-                                                style: TextStyle(color: Colors.white), // Texto en blanco
-                                                dropdownColor: const Color(0xFF2B193E), // Fondo del desplegable
-                                              ),
-                                            ),
                                         ]),
                                     const SizedBox(height: 30),
 
@@ -993,7 +1186,7 @@ class _EditarAutoScreenState extends State<EditarAutoScreen> {
                                       ),
                                       child: const Text('Guardar'),
                                     ),
-
+                                    const SizedBox(height: 10),
                                     // ELIMINAR AUTO ************************************************
                                     ElevatedButton(
                                       onPressed: guardarAuto,
@@ -1004,7 +1197,7 @@ class _EditarAutoScreenState extends State<EditarAutoScreen> {
                                         padding: const EdgeInsets.symmetric(
                                             horizontal: 20, vertical: 10),
                                       ),
-                                      child: const Text('ELIMINAR AUTO'),
+                                      child: const Text('Eliminar Auto'),
                                     ),
                                   ],
                                 ),

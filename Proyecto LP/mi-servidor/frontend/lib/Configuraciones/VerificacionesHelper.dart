@@ -22,14 +22,13 @@ class VerificacionesHelper {
     }
 
     // Validación del precio (Debe ser mayor a 0)
-    RegExp precioRegex = RegExp(r'^\d+$');
     if (precio <= 0) {
       SnackBarHelper.showSnackBar(context, "El precio debe ser mayor a 0.", Colors.red);
       return false;
     }
 
     // Validación del año (Debe ser razonable, entre 1900 y el año actual +1)
-    RegExp anioRegex = RegExp(r'^\d+$');
+
     int anioActual = DateTime.now().year;
     if (anio < 1900 || anio > anioActual + 1) {
       SnackBarHelper.showSnackBar(context, "El año debe estar entre 1900 y ${anioActual + 1}.", Colors.red);
@@ -37,14 +36,12 @@ class VerificacionesHelper {
     }
 
     // Validación del kilometraje (Debe ser 0 o mayor)
-    RegExp kilometrajeRegex = RegExp(r'^\d+$');
     if (kilometraje < 0) {
       SnackBarHelper.showSnackBar(context, "El kilometraje no puede ser negativo.", Colors.red);
       return false;
     }
 
     // Validación del peso (Debe ser mayor a 0)
-    RegExp pesoRegex = RegExp(r'^\d+$');
     if (peso <= 0) {
       SnackBarHelper.showSnackBar(context, "El peso debe ser mayor a 0.", Colors.red);
       return false;

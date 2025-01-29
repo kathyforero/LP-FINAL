@@ -474,6 +474,7 @@ class _CrearAutoScreenState extends State<CrearAutoScreen> {
                                     ),
                                   ),
 
+
                                   SizedBox(width: 30),
 
                                   // Boton derecha ************************************************
