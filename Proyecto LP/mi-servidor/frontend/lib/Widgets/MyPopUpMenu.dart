@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../Pantallas/MisAutosScreen.dart';
-import '../Pantallas/MisFavoritosScreen.dart';
 import '../Pantallas/LoginScreen.dart';
 
 class MyPopupMenu extends StatefulWidget {
@@ -15,9 +14,6 @@ class _MyPopupMenuState extends State<MyPopupMenu> {
   Color _backgroundColorAuto = Colors.white;
   Color _textColorAuto = Colors.black;
 
-  Color _backgroundColorFavoritos = Colors.white;
-  Color _textColorFavoritos = Colors.black;
-
   Color _backgroundColorCerrar = Colors.white;
   Color _textColorCerrar = Colors.black;
 
@@ -27,10 +23,6 @@ class _MyPopupMenuState extends State<MyPopupMenu> {
       if (item == 'misautos') {
         _backgroundColorAuto = isHovering ? Color(0xFF9576DA) : Colors.white;
         _textColorAuto = isHovering ? Colors.white : Colors.black;
-      } else if (item == 'misfavoritos') {
-        _backgroundColorFavoritos =
-            isHovering ? Color(0xFF9576DA) : Colors.white;
-        _textColorFavoritos = isHovering ? Colors.white : Colors.black;
       } else if (item == 'cerrarsesion') {
         _backgroundColorCerrar = isHovering ? Color(0xFF9576DA) : Colors.white;
         _textColorCerrar = isHovering ? Colors.white : Colors.black;
@@ -43,9 +35,6 @@ class _MyPopupMenuState extends State<MyPopupMenu> {
     setState(() {
       _backgroundColorAuto = Colors.white;
       _textColorAuto = Colors.black;
-
-      _backgroundColorFavoritos = Colors.white;
-      _textColorFavoritos = Colors.black;
 
       _backgroundColorCerrar = Colors.white;
       _textColorCerrar = Colors.black;
@@ -67,13 +56,6 @@ class _MyPopupMenuState extends State<MyPopupMenu> {
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => MisAutosScreen()),
-            ).then((_) {
-              _resetColors(); // Restaurar colores al regresar
-            });
-          } else if (value == 'misfavoritos') {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => MisFavoritosScreen()),
             ).then((_) {
               _resetColors(); // Restaurar colores al regresar
             });
@@ -100,21 +82,7 @@ class _MyPopupMenuState extends State<MyPopupMenu> {
                 ),
               ),
             ),
-          ),
-          PopupMenuItem(
-            value: 'misfavoritos',
-            child: MouseRegion(
-              onEnter: (_) => _onHover('misfavoritos', true),
-              onExit: (_) => _onHover('misfavoritos', false),
-              child: Container(
-                color: _backgroundColorFavoritos,
-                child: Text(
-                  'Mis Favoritos',
-                  style: TextStyle(color: _textColorFavoritos),
-                ),
-              ),
-            ),
-          ),
+          ),          
           PopupMenuItem(
             value: 'cerrarsesion',
             child: MouseRegion(

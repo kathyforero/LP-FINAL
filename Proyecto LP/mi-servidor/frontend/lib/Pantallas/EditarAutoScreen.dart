@@ -47,11 +47,11 @@ class _EditarAutoScreenState extends State<EditarAutoScreen> {
   String? transmisionSeleccionada;
   String? ubicacionSeleccionada;
   String? estadoSeleccionado;
-  final List<Uint8List> _fotosSeleccionadas1 = [];
+  List<Uint8List> _fotosSeleccionadas1 = [];
   int indiceActual = 0;
 
   List<String>? marcas;
-  Map<String, List<String>> modelosPorMarca = {};
+  List<String>? modelos;
   List<String>? tipos;
   List<String>? motor;
   List<String>? transmision;
@@ -79,6 +79,7 @@ class _EditarAutoScreenState extends State<EditarAutoScreen> {
     pesoController.text = auto['peso']?.toString() ?? '';
 
     cargarMarcas();
+    cargarModelos(auto['marca']);
     cargarTipos();
     cargarMotor();
     cargarTransmision();
@@ -117,17 +118,21 @@ class _EditarAutoScreenState extends State<EditarAutoScreen> {
   }
 
   Future<void> cargarModelos(String marca) async {
-    if (modelosPorMarca.containsKey(marca))
-      return; // Si ya existen, no volver a cargar
-    setState(() => isCargandoModelos = true);
     try {
       final listaModelos = await ApiServicio.obtenerModelos(marca);
       setState(() {
-        modelosPorMarca[marca] = listaModelos;
+        modelos = listaModelos.toSet().toList(); // Elimina duplicados
         isCargandoModelos = false;
+
+        // Convertir a minúsculas para comparación
+        String modeloAuto = auto['modelo']?.toLowerCase() ?? '';
+
+        modeloSeleccionado = modelos?.firstWhere(
+            (modelo) => modelo.toLowerCase() == modeloAuto,
+            orElse: () => modelos!.isNotEmpty ? modelos!.first : '');
       });
     } catch (e) {
-      print('Error al cargar modelos para $marca: $e');
+      print('Error al cargar modelos: $e');
       setState(() => isCargandoModelos = false);
     }
   }
@@ -238,15 +243,28 @@ class _EditarAutoScreenState extends State<EditarAutoScreen> {
   }
 
   Future<void> seleccionarFotos() async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles();
+    try {
+      FilePickerResult? result = await FilePicker.platform.pickFiles(
+        type: FileType.image, // Asegura que solo seleccione imágenes
+      );
 
-    if (result != null && result.files.single.bytes != null) {
-      setState(() {
-        _fotosSeleccionadas1.add(result.files.single.bytes!);
-        if (_fotosSeleccionadas.isEmpty) {
-          indiceActual = 0;
-        }
-      });
+      if (result != null &&
+          result.files.isNotEmpty &&
+          result.files.single.bytes != null) {
+        print(getListaCombinada().length);
+        setState(() {
+          _fotosSeleccionadas1 = List.from(_fotosSeleccionadas1)
+            ..add(result.files.single.bytes!);
+        });
+
+        print("Imagen añadida correctamente.");
+
+        print(getListaCombinada().length);
+      } else {
+        print("No se seleccionó ninguna imagen.");
+      }
+    } catch (e) {
+      print("Error al seleccionar la imagen: $e");
     }
   }
 
@@ -268,20 +286,20 @@ class _EditarAutoScreenState extends State<EditarAutoScreen> {
 
   void eliminarImagenActual() {
     setState(() {
-      if(indiceActual>=_fotosSeleccionadas.length){
-        _fotosSeleccionadas.removeAt(indiceActual-_fotosSeleccionadas.length);
-      }
-
-      if (_fotosSeleccionadas.isNotEmpty) {
+      int totalImagenes =
+          _fotosSeleccionadas.length + _fotosSeleccionadas1.length;
+      if (indiceActual >= _fotosSeleccionadas.length) {
+        _fotosSeleccionadas1
+            .removeAt(indiceActual - _fotosSeleccionadas.length);
+      } else if (indiceActual < _fotosSeleccionadas.length) {
         _fotosSeleccionadas.removeAt(indiceActual);
-
-        // Ajustar el índice si es necesario
-        if (indiceActual >= _fotosSeleccionadas.length && indiceActual > 0) {
-          indiceActual--;
-        }
       } else {
         SnackBarHelper.showSnackBar(
             context, "¡No hay imagenes que borrar!", Colors.grey);
+      }
+      // Ajustar el índice si es necesario
+      if (indiceActual >= totalImagenes - 1 && indiceActual > 0) {
+        indiceActual--;
       }
     });
   }
@@ -344,7 +362,7 @@ class _EditarAutoScreenState extends State<EditarAutoScreen> {
       return;
     }
 
-    if (_fotosSeleccionadas.isEmpty) {
+    if (getListaCombinada().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
             content: Text('Por favor selecciona al menos una imagen.')),
@@ -362,11 +380,12 @@ class _EditarAutoScreenState extends State<EditarAutoScreen> {
 
     FirebaseStorageService storageService = FirebaseStorageService();
     List<String> urls = await storageService.subirFotos(_fotosSeleccionadas1);
-
-    if (urls.isEmpty) {
-      SnackBarHelper.showSnackBar(
-          context, 'Error al subir imágenes.', Colors.red);
-      return;
+    if (_fotosSeleccionadas1.isNotEmpty) {
+      if (urls.isEmpty) {
+        SnackBarHelper.showSnackBar(
+            context, 'Error al subir imágenes.', Colors.red);
+        return;
+      }
     }
 
     if (auto['placa'] != placa) {
@@ -392,7 +411,7 @@ class _EditarAutoScreenState extends State<EditarAutoScreen> {
       'ubicacion': ubicacion,
       'estado': estado,
       'usuario': usuario,
-      'fotos': auto['fotos'] + urls,
+      'fotos': _fotosSeleccionadas + urls,
     };
 
     bool exito = await ApiServicio.actualizarAuto(autoData);
@@ -472,7 +491,7 @@ class _EditarAutoScreenState extends State<EditarAutoScreen> {
         body: Row(
           children: [
             // Main content
-            Expanded(
+            Flexible(
               child: Column(
                 children: [
                   Padding(
@@ -529,25 +548,30 @@ class _EditarAutoScreenState extends State<EditarAutoScreen> {
                               SizedBox(height: 10),
 
                               //Presentación de imagenes
-                              SizedBox(
-                                width: 650,
-                                height: 576,
-                                child: getListaCombinada().isNotEmpty
-                                    ? getListaCombinada()[indiceActual] is String
-                                        ? Image.network(
-                                            getListaCombinada()[indiceActual], // URL
-                                            fit: BoxFit.contain,
-                                          )
-                                        : Image.memory(
-                                            getListaCombinada()[indiceActual], // Uint8List (foto nueva)
-                                            fit: BoxFit.contain,
-                                          )
-                                    : const Image(
-                                        image: NetworkImage(
-                                            'https://i.postimg.cc/qRYLrN7X/preview.png'), // Placeholder
-                                        fit: BoxFit.contain,
-                                      ),
-                              ),
+                              Stack(children: [
+                                SizedBox(
+                                  width: 650,
+                                  height: 576,
+                                  child: getListaCombinada().isNotEmpty
+                                      ? getListaCombinada()[indiceActual]
+                                              is String
+                                          ? Image.network(
+                                              getListaCombinada()[
+                                                  indiceActual], // URL
+                                              fit: BoxFit.contain,
+                                            )
+                                          : Image.memory(
+                                              getListaCombinada()[
+                                                  indiceActual], // Uint8List (foto nueva)
+                                              fit: BoxFit.contain,
+                                            )
+                                      : const Image(
+                                          image: NetworkImage(
+                                              'https://i.postimg.cc/qRYLrN7X/preview.png'), // Placeholder
+                                          fit: BoxFit.contain,
+                                        ),
+                                ),
+                              ]),
 
                               SizedBox(height: 10),
 
@@ -577,8 +601,8 @@ class _EditarAutoScreenState extends State<EditarAutoScreen> {
                                   SizedBox(width: 30),
 
                                   Text(
-                                    _fotosSeleccionadas.isNotEmpty
-                                        ? '${indiceActual + 1} / ${_fotosSeleccionadas.length}'
+                                    getListaCombinada().isNotEmpty
+                                        ? '${indiceActual + 1} / ${getListaCombinada().length}'
                                         : '0/0',
                                     style: const TextStyle(
                                       fontFamily: 'Century Gothic',
@@ -597,7 +621,7 @@ class _EditarAutoScreenState extends State<EditarAutoScreen> {
                                     child: GestureDetector(
                                       onTap: () {
                                         if (indiceActual <
-                                            _fotosSeleccionadas.length - 1) {
+                                            getListaCombinada().length - 1) {
                                           imagenSiguiente();
                                         }
                                       },
@@ -727,7 +751,8 @@ class _EditarAutoScreenState extends State<EditarAutoScreen> {
                                                       setState(() {
                                                         marcaSeleccionada =
                                                             value;
-                                                        cargarModelos(value!);
+                                                        cargarModelos(
+                                                            marcaSeleccionada!);
                                                       });
                                                     },
                                                     decoration:
@@ -781,25 +806,18 @@ class _EditarAutoScreenState extends State<EditarAutoScreen> {
                                                         DropdownButtonFormField<
                                                             String>(
                                                       value: modeloSeleccionado,
-                                                      items: (marcaSeleccionada !=
-                                                                  null &&
-                                                              modelosPorMarca
-                                                                  .containsKey(
-                                                                      marcaSeleccionada))
-                                                          ? modelosPorMarca[
-                                                                  marcaSeleccionada]!
-                                                              .map((modelo) {
-                                                              return DropdownMenuItem(
-                                                                value: modelo,
-                                                                child: Text(
-                                                                  modelo,
-                                                                  style: TextStyle(
-                                                                      color: Colors
-                                                                          .white), // Texto blanco
-                                                                ),
-                                                              );
-                                                            }).toList()
-                                                          : [],
+                                                      items: modelos
+                                                          ?.map((modelo) {
+                                                        return DropdownMenuItem(
+                                                          value: modelo,
+                                                          child: Text(
+                                                            modelo,
+                                                            style: TextStyle(
+                                                                color: Colors
+                                                                    .white), // Pone el texto en blanco
+                                                          ),
+                                                        );
+                                                      }).toList(),
                                                       onChanged: (value) {
                                                         setState(() {
                                                           modeloSeleccionado =
