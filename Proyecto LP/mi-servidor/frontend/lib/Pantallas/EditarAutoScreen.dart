@@ -683,7 +683,7 @@ class _EditarAutoScreenState extends State<EditarAutoScreen> {
                                         ),
                                       ],
                                     ),
-                                    const SizedBox(height: 10),
+                                    const SizedBox(height: 5),
 
                                     // Precio ************************************************
                                     Row(
@@ -713,7 +713,7 @@ class _EditarAutoScreenState extends State<EditarAutoScreen> {
                                         ),
                                       ],
                                     ),
-                                    const SizedBox(height: 10),
+                                    const SizedBox(height: 5),
 
                                     // Marca ************************************************
                                     Row(
@@ -782,7 +782,7 @@ class _EditarAutoScreenState extends State<EditarAutoScreen> {
                                                   ),
                                                 ),
                                         ]),
-                                    const SizedBox(height: 10),
+                                    const SizedBox(height: 5),
 
                                     // Modelo ************************************************
                                     if (marcaSeleccionada != null)
@@ -851,7 +851,7 @@ class _EditarAutoScreenState extends State<EditarAutoScreen> {
                                                     ),
                                                   ),
                                           ]),
-                                    const SizedBox(height: 10),
+                                    const SizedBox(height: 5),
 
                                     // Tipo ************************************************
                                     Row(
@@ -918,7 +918,7 @@ class _EditarAutoScreenState extends State<EditarAutoScreen> {
                                                   ),
                                                 ),
                                         ]),
-                                    const SizedBox(height: 10),
+                                    const SizedBox(height: 5),
 
                                     // Año ************************************************
                                     Row(
@@ -948,7 +948,7 @@ class _EditarAutoScreenState extends State<EditarAutoScreen> {
                                         ),
                                       ],
                                     ),
-                                    const SizedBox(height: 10),
+                                    const SizedBox(height: 5),
 
                                     // Kilometraje ************************************************
                                     Row(
@@ -978,7 +978,7 @@ class _EditarAutoScreenState extends State<EditarAutoScreen> {
                                         ),
                                       ],
                                     ),
-                                    const SizedBox(height: 10),
+                                    const SizedBox(height: 5),
 
                                     // Motor ************************************************
                                     Row(
@@ -1045,7 +1045,7 @@ class _EditarAutoScreenState extends State<EditarAutoScreen> {
                                                   ),
                                                 ),
                                         ]),
-                                    const SizedBox(height: 10),
+                                    const SizedBox(height: 5),
 
                                     // Transmisión ************************************************
                                     Row(
@@ -1114,7 +1114,7 @@ class _EditarAutoScreenState extends State<EditarAutoScreen> {
                                                   ),
                                                 ),
                                         ]),
-                                    const SizedBox(height: 10),
+                                    const SizedBox(height: 5),
 
                                     // Peso ************************************************
                                     Row(
@@ -1144,7 +1144,7 @@ class _EditarAutoScreenState extends State<EditarAutoScreen> {
                                         ),
                                       ],
                                     ),
-                                    const SizedBox(height: 10),
+                                    const SizedBox(height: 5),
 
                                     // Ubicación ************************************************
                                     Row(
@@ -1212,7 +1212,7 @@ class _EditarAutoScreenState extends State<EditarAutoScreen> {
                                                   ),
                                                 ),
                                         ]),
-                                    const SizedBox(height: 10),
+                                    const SizedBox(height: 5),
 
                                     // Estado ************************************************
                                     Row(
@@ -1279,7 +1279,7 @@ class _EditarAutoScreenState extends State<EditarAutoScreen> {
                                                   ),
                                                 ),
                                         ]),
-                                    const SizedBox(height: 30),
+                                    const SizedBox(height: 10),
 
                                     // Guardar ************************************************
                                     ElevatedButton(
@@ -1306,7 +1306,7 @@ class _EditarAutoScreenState extends State<EditarAutoScreen> {
                                       ),
                                       child: const Text('Guardar'),
                                     ),
-                                    const SizedBox(height: 10),
+                                    const SizedBox(height: 5),
                                     // ELIMINAR AUTO ************************************************
                                     ElevatedButton(
                                       onPressed: eliminarAuto,
