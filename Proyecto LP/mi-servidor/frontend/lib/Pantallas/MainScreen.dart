@@ -616,91 +616,90 @@ class _MainScreenState extends State<MainScreen> {
 
                 // Vehicle grid
                 _cargandoAutos
-    ? const Center(child: CircularProgressIndicator()) // Indicador de carga
-    : (_autos == null || _autos!.isEmpty) // Verifica si _autos es null o vacío
-        ? const Center(
-            child: Text(
-              'No hay autos para mostrar.',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 20,
-                fontFamily: 'Calibri Light',
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          )
-        : Expanded(
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                const double itemWidth = 200;
-                const double itemHeight = 300;
-                int crossAxisCount = (constraints.maxWidth / itemWidth).floor();
+            ? const Center(child: CircularProgressIndicator()) // Indicador de carga
+            : (_autos == null || _autos!.isEmpty) // Verifica si _autos es null o vacío
+                ? const Center(
+                    child: Text(
+                      'No hay autos para mostrar.',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 20,
+                        fontFamily: 'Calibri Light',
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  )
+                : Expanded(
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              const double itemWidth = 250; // 🔹 Aumenta el ancho de la tarjeta
+              const double itemHeight = 325; // 🔹 Aumenta la altura de la tarjeta
+              int crossAxisCount = (constraints.maxWidth / itemWidth).floor();
 
-                return GridView.builder(
-                  padding: const EdgeInsets.all(16.0),
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: crossAxisCount,
-                    crossAxisSpacing: 16,
-                    mainAxisSpacing: 16,
-                    childAspectRatio: itemWidth / itemHeight,
-                  ),
-                  itemCount: _autos!.length, // Ahora sabemos que no es null
-                  itemBuilder: (context, index) {
-                    final auto = _autos![index];
+              return GridView.builder(
+                padding: const EdgeInsets.all(16.0),
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: crossAxisCount,
+                  crossAxisSpacing: 16,
+                  mainAxisSpacing: 16,
+                  childAspectRatio: itemWidth / itemHeight,
+                ),
+                itemCount: _autos!.length,
+                itemBuilder: (context, index) {
+                  final auto = _autos![index];
 
-                    return MouseRegion(
-                      cursor: SystemMouseCursors.click,
-                      child: GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => VistaAutoScreen(auto: auto),
-                            ),
-                          );
-                        },
-                        child: SizedBox(
-                          height: itemHeight,
-                          child: Card(
-                            color: const Color(0xFF2B193E),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            elevation: 4,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                ClipRRect(
-                                  borderRadius: const BorderRadius.vertical(
-                                    top: Radius.circular(12),
-                                  ),
-                                  child: SizedBox(
-                                    height: 120,
-                                    width: double.infinity,
-                                    child: Image.network(
-                                      '${auto['fotos'][0]}',
-                                      fit: BoxFit.contain,
-                                      loadingBuilder:
-                                          (context, child, loadingProgress) {
-                                        if (loadingProgress == null)
-                                          return child;
-                                        return const Center(
-                                            child:
-                                                CircularProgressIndicator());
-                                      },
-                                      errorBuilder: (context, error,
-                                          stackTrace) {
-                                        return const Icon(Icons.error,
-                                            size: 50, color: Colors.red);
-                                      },
-                                    ),
+                  return MouseRegion(
+                    cursor: SystemMouseCursors.click,
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => VistaAutoScreen(auto: auto),
+                          ),
+                        );
+                      },
+                      child: SizedBox(
+                        height: itemHeight, // 🔹 Se mantiene el tamaño aumentado
+                        child: Card(
+                          color: const Color(0xFF2B193E),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          elevation: 4,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // 🔹 Aumenta el tamaño de la imagen
+                              ClipRRect(
+                                borderRadius: const BorderRadius.vertical(
+                                  top: Radius.circular(12),
+                                ),
+                                child: SizedBox(
+                                  height: 160, // 🔹 Aumenta la altura de la imagen
+                                  width: double.infinity,
+                                  child: Image.network(
+                                    '${auto['fotos'][0]}',
+                                    fit: BoxFit.cover, // 🔹 Cambia a 'cover' para que la imagen ocupe más espacio
+                                    loadingBuilder: (context, child, loadingProgress) {
+                                      if (loadingProgress == null) return child;
+                                      return const Center(
+                                          child: CircularProgressIndicator());
+                                    },
+                                    errorBuilder: (context, error, stackTrace) {
+                                      return const Icon(Icons.error,
+                                          size: 50, color: Colors.red);
+                                    },
                                   ),
                                 ),
-                                Padding(
+                              ),
+                              // 🔹 Usa Expanded para hacer crecer el contenido dentro de la tarjeta
+                              Expanded(
+                                child: Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween, // 🔹 Distribuye el contenido verticalmente
                                     children: [
                                       Text(
                                         auto['marca'] != null
@@ -712,7 +711,7 @@ class _MainScreenState extends State<MainScreen> {
                                             : 'Marca desconocida',
                                         style: const TextStyle(
                                           fontWeight: FontWeight.bold,
-                                          fontSize: 16,
+                                          fontSize: 24, // 🔹 Aumenta el tamaño del texto
                                           color: Colors.white,
                                         ),
                                       ),
@@ -720,6 +719,7 @@ class _MainScreenState extends State<MainScreen> {
                                       Text(
                                         '${auto['anio']} - ${auto['kilometraje']} km',
                                         style: const TextStyle(
+                                            fontSize: 20, // 🔹 Aumenta tamaño de texto
                                             color: Colors.white),
                                       ),
                                       const SizedBox(height: 4),
@@ -730,6 +730,7 @@ class _MainScreenState extends State<MainScreen> {
                                                 'Ubicación desconocida'
                                             : 'Ubicación desconocida',
                                         style: const TextStyle(
+                                            fontSize: 20, // 🔹 Aumenta tamaño de texto
                                             color: Colors.white),
                                       ),
                                       const SizedBox(height: 4),
@@ -737,24 +738,25 @@ class _MainScreenState extends State<MainScreen> {
                                         '\$${auto['precio']}',
                                         style: const TextStyle(
                                           fontWeight: FontWeight.bold,
-                                          fontSize: 16,
+                                          fontSize: 22, // 🔹 Aumenta el tamaño del precio
                                           color: Colors.white,
                                         ),
                                       ),
                                     ],
                                   ),
                                 ),
-                              ],
-                            ),
+                              ),
+                            ],
                           ),
                         ),
                       ),
-                    );
-                  },
-                );
-              },
-            ),
-          )
+                    ),
+                  );
+                },
+              );
+            },
+          ),
+        )
 
 
               ],
