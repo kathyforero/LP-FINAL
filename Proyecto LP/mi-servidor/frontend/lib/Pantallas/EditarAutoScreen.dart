@@ -47,7 +47,7 @@ class _EditarAutoScreenState extends State<EditarAutoScreen> {
   String? transmisionSeleccionada;
   String? ubicacionSeleccionada;
   String? estadoSeleccionado;
-  //final List<Uint8List> _fotosSeleccionadas = [];
+  final List<Uint8List> _fotosSeleccionadas1 = [];
   int indiceActual = 0;
 
   List<String>? marcas;
@@ -86,6 +86,10 @@ class _EditarAutoScreenState extends State<EditarAutoScreen> {
     cargarEstados();
 
     _fotosSeleccionadas = List<String>.from(widget.auto['fotos'] ?? []);
+  }
+
+  List<dynamic> getListaCombinada() {
+    return [..._fotosSeleccionadas, ..._fotosSeleccionadas1];
   }
 
   Future<void> cargarMarcas() async {
@@ -238,8 +242,8 @@ class _EditarAutoScreenState extends State<EditarAutoScreen> {
 
     if (result != null && result.files.single.bytes != null) {
       setState(() {
-        _fotosSeleccionadas.add(result.files.single.bytes!);
-        if (_fotosSeleccionadas.length == 1) {
+        _fotosSeleccionadas1.add(result.files.single.bytes!);
+        if (_fotosSeleccionadas.isEmpty) {
           indiceActual = 0;
         }
       });
@@ -256,7 +260,7 @@ class _EditarAutoScreenState extends State<EditarAutoScreen> {
 
   void imagenSiguiente() {
     setState(() {
-      if (indiceActual < _fotosSeleccionadas.length - 1) {
+      if (indiceActual < getListaCombinada().length - 1) {
         indiceActual++;
       }
     });
@@ -264,6 +268,10 @@ class _EditarAutoScreenState extends State<EditarAutoScreen> {
 
   void eliminarImagenActual() {
     setState(() {
+      if(indiceActual>=_fotosSeleccionadas.length){
+        _fotosSeleccionadas.removeAt(indiceActual-_fotosSeleccionadas.length);
+      }
+
       if (_fotosSeleccionadas.isNotEmpty) {
         _fotosSeleccionadas.removeAt(indiceActual);
 
@@ -353,7 +361,7 @@ class _EditarAutoScreenState extends State<EditarAutoScreen> {
     );
 
     FirebaseStorageService storageService = FirebaseStorageService();
-    List<String> urls = await storageService.subirFotos(_fotosSeleccionadas);
+    List<String> urls = await storageService.subirFotos(_fotosSeleccionadas1);
 
     if (urls.isEmpty) {
       SnackBarHelper.showSnackBar(
@@ -384,7 +392,7 @@ class _EditarAutoScreenState extends State<EditarAutoScreen> {
       'ubicacion': ubicacion,
       'estado': estado,
       'usuario': usuario,
-      'fotos': urls,
+      'fotos': auto['fotos'] + urls,
     };
 
     bool exito = await ApiServicio.actualizarAuto(autoData);
@@ -524,11 +532,16 @@ class _EditarAutoScreenState extends State<EditarAutoScreen> {
                               SizedBox(
                                 width: 650,
                                 height: 576,
-                                child: _fotosSeleccionadas.isNotEmpty
-                                    ? Image.network(
-                                      _fotosSeleccionadas[indiceActual],
-                                      fit: BoxFit.contain,
-                                    )
+                                child: getListaCombinada().isNotEmpty
+                                    ? getListaCombinada()[indiceActual] is String
+                                        ? Image.network(
+                                            getListaCombinada()[indiceActual], // URL
+                                            fit: BoxFit.contain,
+                                          )
+                                        : Image.memory(
+                                            getListaCombinada()[indiceActual], // Uint8List (foto nueva)
+                                            fit: BoxFit.contain,
+                                          )
                                     : const Image(
                                         image: NetworkImage(
                                             'https://i.postimg.cc/qRYLrN7X/preview.png'), // Placeholder
